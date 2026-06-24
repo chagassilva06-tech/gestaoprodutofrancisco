@@ -97,14 +97,17 @@ function Calculadora() {
     (op: Op) => {
       if (isError) return;
       const value = currentValue();
+      let base = value;
       if (previous === null) {
         setPrevious(value);
       } else if (operator && !waiting) {
-        const result = OPS[operator](previous, value);
-        setPrevious(result);
-        setDisplay(format(result));
+        base = OPS[operator](previous, value);
+        setPrevious(base);
+        setDisplay(format(base));
+      } else {
+        base = previous;
       }
-      setExpression(`${format(previous === null ? value : OPS[operator!] && operator && !waiting ? OPS[operator](previous, value) : previous)} ${op}`);
+      setExpression(`${format(base)} ${op}`);
       setOperator(op);
       setWaiting(true);
     },
