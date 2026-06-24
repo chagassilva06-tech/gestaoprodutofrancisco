@@ -33,6 +33,16 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-calc-bg: var(--calc-bg);
+  --color-calc-panel: var(--calc-panel);
+  --color-calc-num: var(--calc-num);
+  --color-calc-num-hover: var(--calc-num-hover);
+  --color-calc-num-foreground: var(--calc-num-foreground);
+  --color-calc-fn: var(--calc-fn);
+  --color-calc-fn-hover: var(--calc-fn-hover);
+  --color-calc-fn-foreground: var(--calc-fn-foreground);
+  --color-calc-equals: var(--calc-equals);
+  --color-calc-equals-foreground: var(--calc-equals-foreground);
   --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
