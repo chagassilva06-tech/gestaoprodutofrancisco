@@ -121,8 +121,14 @@ function Estoque() {
             <input
               type="search"
               value={busca}
-              onChange={(e) => setBusca(e.target.value)}
+              onChange={(e) => {
+                setBusca(e.target.value);
+                setMostrarSugestoes(true);
+              }}
+              onFocus={() => setMostrarSugestoes(true)}
+              onBlur={() => setTimeout(() => setMostrarSugestoes(false), 150)}
               placeholder="Buscar por código, fabricante, tipo ou produto…"
+              autoComplete="off"
               className="w-full rounded-xl border border-input bg-card px-12 py-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/40"
             />
             {busca && (
@@ -134,6 +140,28 @@ function Estoque() {
               >
                 ✕
               </button>
+            )}
+
+            {/* Sugestões de autocompletar */}
+            {mostrarSugestoes && sugestoes.length > 0 && (
+              <ul className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-primary/40 bg-card shadow-[0_0_20px_-4px_var(--color-primary)] animate-fade-in">
+                {sugestoes.map((s) => (
+                  <li key={s}>
+                    <button
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        setBusca(s);
+                        setMostrarSugestoes(false);
+                      }}
+                      className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition hover:bg-primary/10"
+                    >
+                      <span className="text-muted-foreground">🔎</span>
+                      <span>{s}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
           <p className="mt-2 px-1 text-xs text-muted-foreground">
