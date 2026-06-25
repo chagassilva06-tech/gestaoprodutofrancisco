@@ -73,10 +73,15 @@ function Estoque() {
   // Valores digitados em cada campo "completar estoque"
   const [reposicoes, setReposicoes] = useState<Record<string, string>>({});
 
-  const completarEstoque = (codigo: string) => {
+  const ajustarEstoque = (codigo: string, minimo: number, sinal: 1 | -1) => {
     const valor = Number(reposicoes[codigo]);
     if (!Number.isFinite(valor) || valor <= 0) return;
-    setQuantidades((prev) => ({ ...prev, [codigo]: (prev[codigo] ?? 0) + valor }));
+    setQuantidades((prev) => {
+      const atual = prev[codigo] ?? 0;
+      // Não permite passar do mínimo padronizado nem ficar abaixo de 0
+      const novo = Math.max(0, Math.min(minimo, atual + sinal * valor));
+      return { ...prev, [codigo]: novo };
+    });
     setReposicoes((prev) => ({ ...prev, [codigo]: "" }));
   };
 
