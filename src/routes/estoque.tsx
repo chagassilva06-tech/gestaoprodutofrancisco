@@ -86,6 +86,21 @@ function Estoque() {
     setReposicoes((prev) => ({ ...prev, [codigo]: "" }));
   };
 
+  // Completa um único produto até a quantidade mínima padronizada cadastrada
+  const completarMinimo = (codigo: string, minimo: number) => {
+    setQuantidades((prev) => ({ ...prev, [codigo]: minimo }));
+    setReposicoes((prev) => ({ ...prev, [codigo]: "" }));
+  };
+
+  // Completa TODOS os produtos atualmente listados até o mínimo padronizado
+  const completarTodosMinimo = () => {
+    setQuantidades((prev) => {
+      const novo = { ...prev };
+      for (const p of resultados) novo[p.codigo] = p.minimo;
+      return novo;
+    });
+  };
+
   const zerarEstoque = () => {
     if (
       !window.confirm(
@@ -301,6 +316,13 @@ function Estoque() {
           </button>
           <button
             type="button"
+            onClick={completarTodosMinimo}
+            className="rounded-xl border border-primary bg-primary/15 px-6 py-3 text-sm font-semibold text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] transition-all duration-300 hover:-translate-y-0.5 hover:border-primary hover:bg-primary/25 hover:shadow-[0_0_28px_-2px_var(--color-primary)]"
+          >
+            ✅ Completar estoque (todos)
+          </button>
+          <button
+            type="button"
             onClick={zerarEstoque}
             className="rounded-xl border border-red-600 bg-red-950/40 px-6 py-3 text-sm font-semibold text-red-200 shadow-[0_0_18px_-6px_rgba(153,27,27,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:border-red-500 hover:bg-red-900/50 hover:shadow-[0_0_28px_-2px_rgba(153,27,27,0.95)]"
           >
@@ -427,6 +449,14 @@ function Estoque() {
                             className="h-8 rounded-md border border-warning/40 bg-warning/10 px-3 text-xs font-semibold text-foreground transition hover:bg-warning/20 disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             ➖ Diminuir quantidade
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => completarMinimo(p.codigo, p.minimo)}
+                            disabled={atual >= p.minimo}
+                            className="h-8 rounded-md border border-primary bg-primary/15 px-3 text-xs font-semibold text-foreground transition hover:bg-primary/25 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            ✅ Completar ao mínimo ({p.minimo})
                           </button>
                           <button
                             type="button"
