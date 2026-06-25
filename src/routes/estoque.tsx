@@ -315,7 +315,7 @@ function Estoque() {
                         {/* Completar / ajustar estoque (sempre disponível) */}
                         <div
                           className={`mt-3 flex flex-wrap items-center gap-2 rounded-lg border p-2 ${
-                            baixo
+                            baixo || acima
                               ? "border-warning/30 bg-warning/5"
                               : "border-primary/30 bg-primary/5"
                           }`}
