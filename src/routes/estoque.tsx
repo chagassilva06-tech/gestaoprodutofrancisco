@@ -86,6 +86,21 @@ function Estoque() {
     setReposicoes((prev) => ({ ...prev, [codigo]: "" }));
   };
 
+  // Completa um único produto até a quantidade mínima padronizada cadastrada
+  const completarMinimo = (codigo: string, minimo: number) => {
+    setQuantidades((prev) => ({ ...prev, [codigo]: minimo }));
+    setReposicoes((prev) => ({ ...prev, [codigo]: "" }));
+  };
+
+  // Completa TODOS os produtos atualmente listados até o mínimo padronizado
+  const completarTodosMinimo = () => {
+    setQuantidades((prev) => {
+      const novo = { ...prev };
+      for (const p of resultados) novo[p.codigo] = p.minimo;
+      return novo;
+    });
+  };
+
   const zerarEstoque = () => {
     if (
       !window.confirm(
