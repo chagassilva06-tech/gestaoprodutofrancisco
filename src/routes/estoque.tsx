@@ -23,122 +23,64 @@ export const Route = createFileRoute("/estoque")({
 
 type Produto = {
   codigo: string;
-  produto: string;
   fabricante: string;
   tipo: string;
-  categoria: string;
-  icon: string;
+  produto: string;
   quantidade: number;
   minimo: number;
 };
 
+const MINIMO_PADRAO = 500;
+
 const PRODUTOS: Produto[] = [
-  {
-    codigo: "AL-001",
-    produto: "Arroz Integral 5kg",
-    fabricante: "Tio João",
-    tipo: "Grãos",
-    categoria: "Alimentos",
-    icon: "🍎",
-    quantidade: 42,
-    minimo: 50,
-  },
-  {
-    codigo: "AL-002",
-    produto: "Feijão Carioca 1kg",
-    fabricante: "Camil",
-    tipo: "Grãos",
-    categoria: "Alimentos",
-    icon: "🍎",
-    quantidade: 80,
-    minimo: 50,
-  },
-  {
-    codigo: "BE-001",
-    produto: "Refrigerante Cola 2L",
-    fabricante: "Coca-Cola",
-    tipo: "Bebida Gaseificada",
-    categoria: "Bebidas",
-    icon: "🥤",
-    quantidade: 60,
-    minimo: 75,
-  },
-  {
-    codigo: "BE-002",
-    produto: "Água Mineral 500ml",
-    fabricante: "Crystal",
-    tipo: "Água",
-    categoria: "Bebidas",
-    icon: "🥤",
-    quantidade: 120,
-    minimo: 75,
-  },
-  {
-    codigo: "LI-001",
-    produto: "Detergente Neutro 500ml",
-    fabricante: "Ypê",
-    tipo: "Limpeza Geral",
-    categoria: "Limpeza",
-    icon: "🧴",
-    quantidade: 20,
-    minimo: 30,
-  },
-  {
-    codigo: "LI-002",
-    produto: "Água Sanitária 2L",
-    fabricante: "Qboa",
-    tipo: "Desinfetante",
-    categoria: "Limpeza",
-    icon: "🧴",
-    quantidade: 45,
-    minimo: 30,
-  },
-  {
-    codigo: "HI-001",
-    produto: "Sabonete Líquido 250ml",
-    fabricante: "Protex",
-    tipo: "Higiene Pessoal",
-    categoria: "Higiene",
-    icon: "🧼",
-    quantidade: 18,
-    minimo: 40,
-  },
-  {
-    codigo: "HI-002",
-    produto: "Papel Higiênico 12 un.",
-    fabricante: "Neve",
-    tipo: "Higiene Pessoal",
-    categoria: "Higiene",
-    icon: "🧼",
-    quantidade: 90,
-    minimo: 40,
-  },
+  { codigo: "6163", fabricante: "DELPHI", tipo: "Fabricante", produto: "Injeção/ignição", quantidade: 100, minimo: MINIMO_PADRAO },
+  { codigo: "4843", fabricante: "ELGIN S/A", tipo: "Fabricante", produto: "Pilhas", quantidade: 200, minimo: MINIMO_PADRAO },
+  { codigo: "115", fabricante: "EQUIPAGE/EQMAX", tipo: "Fabricante", produto: "Racks de teto", quantidade: 300, minimo: MINIMO_PADRAO },
+  { codigo: "2370", fabricante: "FILTROS BRASIL", tipo: "Fabricante", produto: "Filtros cabine", quantidade: 400, minimo: MINIMO_PADRAO },
+  { codigo: "6405", fabricante: "Flash Cover Capota Marítima", tipo: "Fabricante", produto: "Capota Marítima", quantidade: 500, minimo: MINIMO_PADRAO },
+  { codigo: "3115", fabricante: "GRID CALOTAS", tipo: "Fabricante", produto: "Calotas", quantidade: 600, minimo: MINIMO_PADRAO },
+  { codigo: "2561", fabricante: "H BUSTER", tipo: "Fabricante", produto: "Mídia/tela", quantidade: 700, minimo: MINIMO_PADRAO },
+  { codigo: "355", fabricante: "HENKEL LTDA", tipo: "Fabricante", produto: "Cola/adesivos", quantidade: 800, minimo: MINIMO_PADRAO },
+  { codigo: "8047", fabricante: "M3 capas", tipo: "Fabricante", produto: "Capas de volante", quantidade: 900, minimo: MINIMO_PADRAO },
+  { codigo: "1497", fabricante: "Magneti Marelli", tipo: "Fabricante", produto: "Bobinas/vela", quantidade: 1000, minimo: MINIMO_PADRAO },
+  { codigo: "3102", fabricante: "MULTILASER", tipo: "Fabricante", produto: "Multimídia", quantidade: 2000, minimo: MINIMO_PADRAO },
+  { codigo: "953", fabricante: "NP ADESIVOS", tipo: "Fabricante", produto: "Adesivos", quantidade: 3000, minimo: MINIMO_PADRAO },
+  { codigo: "2389", fabricante: "PETROBRAS (BR)", tipo: "Fabricante", produto: "Lubrificantes", quantidade: 4000, minimo: MINIMO_PADRAO },
+  { codigo: "4768", fabricante: "PHILCO", tipo: "Fabricante", produto: "Pilhas/Aparelhos eletrônicos", quantidade: 5000, minimo: MINIMO_PADRAO },
+  { codigo: "56", fabricante: "PIONEER", tipo: "Fabricante", produto: "Som automotivo", quantidade: 6000, minimo: MINIMO_PADRAO },
+  { codigo: "1751", fabricante: "ROADSTAR", tipo: "Fabricante", produto: "Display/Telas som", quantidade: 7000, minimo: MINIMO_PADRAO },
+  { codigo: "7436", fabricante: "SAINT-GOBAIN DISTRI BRASIL LTDA", tipo: "Fabricante", produto: "Caixa de som/Fones", quantidade: 8000, minimo: MINIMO_PADRAO },
+  { codigo: "6127", fabricante: "SUPORTE REI", tipo: "Fabricante", produto: "Suporte/Linha pesada", quantidade: 9000, minimo: MINIMO_PADRAO },
+  { codigo: "4000", fabricante: "TEC FIL", tipo: "Fabricante", produto: "Filtros de ar", quantidade: 1000, minimo: MINIMO_PADRAO },
+  { codigo: "362", fabricante: "WEGA MOTORS", tipo: "Fabricante", produto: "Filtros/Palhetas", quantidade: 2000, minimo: MINIMO_PADRAO },
 ];
 
-const CARDS: { categoria: string; icon: string }[] = [
-  { categoria: "Alimentos", icon: "🍎" },
-  { categoria: "Bebidas", icon: "🥤" },
-  { categoria: "Limpeza", icon: "🧴" },
-  { categoria: "Higiene", icon: "🧼" },
+const CARDS: { titulo: string; icon: string; termo: string }[] = [
+  { titulo: "Filtros de ar", icon: "🌀", termo: "filtro" },
+  { titulo: "Mídia Player", icon: "📺", termo: "mídia" },
+  { titulo: "Calotas", icon: "🛞", termo: "calota" },
+  { titulo: "Palhetas", icon: "🧹", termo: "palheta" },
 ];
 
 function Estoque() {
   const [busca, setBusca] = useState("");
-  const [categoria, setCategoria] = useState<string | null>(null);
+  const [filtroCard, setFiltroCard] = useState<string | null>(null);
 
   const resultados = useMemo(() => {
     const termo = busca.trim().toLowerCase();
+    const card = filtroCard?.toLowerCase() ?? null;
     return PRODUTOS.filter((p) => {
-      const matchCategoria = categoria ? p.categoria === categoria : true;
+      const alvo = `${p.produto} ${p.tipo} ${p.fabricante}`.toLowerCase();
+      const matchCard = card ? alvo.includes(card) : true;
       const matchBusca =
         termo === "" ||
         p.codigo.toLowerCase().includes(termo) ||
         p.fabricante.toLowerCase().includes(termo) ||
         p.tipo.toLowerCase().includes(termo) ||
         p.produto.toLowerCase().includes(termo);
-      return matchCategoria && matchBusca;
+      return matchCard && matchBusca;
     });
-  }, [busca, categoria]);
+  }, [busca, filtroCard]);
 
   return (
     <div className="min-h-screen bg-background px-4 py-10 sm:py-16">
@@ -186,15 +128,18 @@ function Estoque() {
           </p>
         </div>
 
-        {/* 4 cards principais por categoria */}
+        {/* 4 cards principais por produto */}
         <section className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {CARDS.map((c) => {
-            const ativo = categoria === c.categoria;
+            const ativo = filtroCard === c.termo;
+            const total = PRODUTOS.filter((p) =>
+              `${p.produto} ${p.tipo} ${p.fabricante}`.toLowerCase().includes(c.termo),
+            ).length;
             return (
               <button
-                key={c.categoria}
+                key={c.titulo}
                 type="button"
-                onClick={() => setCategoria(ativo ? null : c.categoria)}
+                onClick={() => setFiltroCard(ativo ? null : c.termo)}
                 className={`group rounded-xl border p-4 text-left transition-all ${
                   ativo
                     ? "border-primary bg-primary/10 shadow-[0_0_0_1px_var(--color-primary)]"
@@ -202,10 +147,8 @@ function Estoque() {
                 }`}
               >
                 <div className="text-2xl">{c.icon}</div>
-                <div className="mt-2 font-display text-sm font-semibold">{c.categoria}</div>
-                <div className="text-xs text-muted-foreground">
-                  {PRODUTOS.filter((p) => p.categoria === c.categoria).length} produto(s)
-                </div>
+                <div className="mt-2 font-display text-sm font-semibold">{c.titulo}</div>
+                <div className="text-xs text-muted-foreground">{total} produto(s)</div>
               </button>
             );
           })}
@@ -215,7 +158,9 @@ function Estoque() {
         <section className="rounded-2xl border border-border bg-card p-4 shadow-lg shadow-black/20 sm:p-6">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-display text-lg font-semibold">
-              {categoria ? `Categoria: ${categoria}` : "Todos os produtos"}
+              {filtroCard
+                ? `Filtro: ${CARDS.find((c) => c.termo === filtroCard)?.titulo}`
+                : "Todos os produtos"}
             </h2>
             <span className="text-xs text-muted-foreground">
               {resultados.length} resultado(s)
@@ -236,7 +181,6 @@ function Estoque() {
                     className="rounded-xl border border-border bg-background p-4"
                   >
                     <div className="flex items-start gap-4">
-                      <span className="text-2xl">{p.icon}</span>
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="rounded-md bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground">
@@ -248,8 +192,7 @@ function Estoque() {
                         </div>
                         <p className="mt-1 text-xs text-muted-foreground">
                           <strong className="text-foreground">Fabricante:</strong> {p.fabricante}{" "}
-                          • <strong className="text-foreground">Tipo:</strong> {p.tipo} •{" "}
-                          <strong className="text-foreground">Categoria:</strong> {p.categoria}
+                          • <strong className="text-foreground">Tipo:</strong> {p.tipo}
                         </p>
                         <div className="mt-3 flex items-center gap-3">
                           <div className="h-2 w-32 overflow-hidden rounded-full bg-secondary">
