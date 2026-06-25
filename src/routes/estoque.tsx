@@ -316,6 +316,13 @@ function Estoque() {
           </button>
           <button
             type="button"
+            onClick={completarTodosMinimo}
+            className="rounded-xl border border-primary bg-primary/15 px-6 py-3 text-sm font-semibold text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] transition-all duration-300 hover:-translate-y-0.5 hover:border-primary hover:bg-primary/25 hover:shadow-[0_0_28px_-2px_var(--color-primary)]"
+          >
+            ✅ Completar estoque (todos)
+          </button>
+          <button
+            type="button"
             onClick={zerarEstoque}
             className="rounded-xl border border-red-600 bg-red-950/40 px-6 py-3 text-sm font-semibold text-red-200 shadow-[0_0_18px_-6px_rgba(153,27,27,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:border-red-500 hover:bg-red-900/50 hover:shadow-[0_0_28px_-2px_rgba(153,27,27,0.95)]"
           >
