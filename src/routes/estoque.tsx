@@ -110,9 +110,17 @@ function Estoque() {
         p.fabricante.toLowerCase().includes(termo) ||
         p.tipo.toLowerCase().includes(termo) ||
         p.produto.toLowerCase().includes(termo);
-      return matchCard && matchBusca;
+      const atual = quantidades[p.codigo] ?? p.quantidade;
+      const precisaRepor = atual < p.minimo;
+      const matchRepor =
+        filtroRepor === null
+          ? true
+          : filtroRepor === "repor"
+            ? precisaRepor
+            : !precisaRepor;
+      return matchCard && matchBusca && matchRepor;
     });
-  }, [busca, filtroCard]);
+  }, [busca, filtroCard, filtroRepor, quantidades]);
 
   const totalProdutos = PRODUTOS.length;
   const totalItens = Object.values(quantidades).reduce((soma, q) => soma + q, 0);
