@@ -322,13 +322,20 @@ function Estoque() {
                         >
                           <span
                             className={`text-xs font-medium ${
-                              baixo ? "text-warning-foreground" : "text-foreground"
+                              baixo
+                                ? "text-warning-foreground"
+                                : acima
+                                  ? "text-warning-foreground"
+                                  : "text-foreground"
                             }`}
                           >
                             {baixo
                               ? `Faltam ${p.minimo - atual} un.`
-                              : "✅ Estoque completo (100%)"}
+                              : acima
+                                ? `⚠️ Estoque ${Math.round((atual / p.minimo) * 100)}% (excedeu em ${atual - p.minimo} un.) — insira apenas o mínimo (${p.minimo} un.)`
+                                : "✅ Estoque completo (100%)"}
                           </span>
+
                           <input
                             type="number"
                             min={1}
