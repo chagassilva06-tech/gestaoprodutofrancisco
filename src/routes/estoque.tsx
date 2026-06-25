@@ -66,6 +66,19 @@ function Estoque() {
   const [busca, setBusca] = useState("");
   const [filtroCard, setFiltroCard] = useState<string | null>(null);
   const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
+  // Quantidades atuais (com ajustes manuais aplicados)
+  const [quantidades, setQuantidades] = useState<Record<string, number>>(
+    () => Object.fromEntries(PRODUTOS.map((p) => [p.codigo, p.quantidade])),
+  );
+  // Valores digitados em cada campo "completar estoque"
+  const [reposicoes, setReposicoes] = useState<Record<string, string>>({});
+
+  const completarEstoque = (codigo: string) => {
+    const valor = Number(reposicoes[codigo]);
+    if (!Number.isFinite(valor) || valor <= 0) return;
+    setQuantidades((prev) => ({ ...prev, [codigo]: (prev[codigo] ?? 0) + valor }));
+    setReposicoes((prev) => ({ ...prev, [codigo]: "" }));
+  };
 
   const sugestoes = useMemo(() => {
     const termo = busca.trim().toLowerCase();
