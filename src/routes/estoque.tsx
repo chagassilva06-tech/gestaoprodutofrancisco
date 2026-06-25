@@ -65,6 +65,19 @@ const CARDS: { titulo: string; icon: string; termo: string }[] = [
 function Estoque() {
   const [busca, setBusca] = useState("");
   const [filtroCard, setFiltroCard] = useState<string | null>(null);
+  const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
+
+  const sugestoes = useMemo(() => {
+    const termo = busca.trim().toLowerCase();
+    if (termo === "") return [];
+    const valores = new Set<string>();
+    for (const p of PRODUTOS) {
+      for (const campo of [p.produto, p.fabricante, p.tipo, p.codigo]) {
+        if (campo.toLowerCase().includes(termo)) valores.add(campo);
+      }
+    }
+    return Array.from(valores).slice(0, 6);
+  }, [busca]);
 
   const resultados = useMemo(() => {
     const termo = busca.trim().toLowerCase();
@@ -108,8 +121,14 @@ function Estoque() {
             <input
               type="search"
               value={busca}
-              onChange={(e) => setBusca(e.target.value)}
+              onChange={(e) => {
+                setBusca(e.target.value);
+                setMostrarSugestoes(true);
+              }}
+              onFocus={() => setMostrarSugestoes(true)}
+              onBlur={() => setTimeout(() => setMostrarSugestoes(false), 150)}
               placeholder="Buscar por código, fabricante, tipo ou produto…"
+              autoComplete="off"
               className="w-full rounded-xl border border-input bg-card px-12 py-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/40"
             />
             {busca && (
@@ -121,6 +140,28 @@ function Estoque() {
               >
                 ✕
               </button>
+            )}
+
+            {/* Sugestões de autocompletar */}
+            {mostrarSugestoes && sugestoes.length > 0 && (
+              <ul className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-primary/40 bg-card shadow-[0_0_20px_-4px_var(--color-primary)] animate-fade-in">
+                {sugestoes.map((s) => (
+                  <li key={s}>
+                    <button
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        setBusca(s);
+                        setMostrarSugestoes(false);
+                      }}
+                      className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition hover:bg-primary/10"
+                    >
+                      <span className="text-muted-foreground">🔎</span>
+                      <span>{s}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
           <p className="mt-2 px-1 text-xs text-muted-foreground">
@@ -140,10 +181,10 @@ function Estoque() {
                 key={c.titulo}
                 type="button"
                 onClick={() => setFiltroCard(ativo ? null : c.termo)}
-                className={`group rounded-xl border p-4 text-left transition-all ${
+                className={`group rounded-xl border p-4 text-left transition-all duration-300 hover:-translate-y-1 ${
                   ativo
-                    ? "border-primary bg-primary/10 shadow-[0_0_0_1px_var(--color-primary)]"
-                    : "border-border bg-card hover:border-accent hover:bg-accent/40"
+                    ? "border-primary bg-primary/10 shadow-[0_0_24px_-2px_var(--color-primary),inset_0_0_0_1px_var(--color-primary)]"
+                    : "border-primary/30 bg-card shadow-[0_0_18px_-6px_var(--color-primary)] hover:border-primary/60 hover:bg-primary/5 hover:shadow-[0_0_28px_-4px_var(--color-primary)]"
                 }`}
               >
                 <div className="text-2xl">{c.icon}</div>
@@ -178,7 +219,7 @@ function Estoque() {
                 return (
                   <li
                     key={p.codigo}
-                    className="rounded-xl border border-border bg-background p-4"
+                    className="rounded-xl border border-primary/20 bg-background p-4 transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_22px_-6px_var(--color-primary)]"
                   >
                     <div className="flex items-start gap-4">
                       <div className="min-w-0 flex-1">
