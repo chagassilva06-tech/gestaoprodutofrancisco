@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 
 export const Route = createFileRoute("/")({
@@ -91,6 +91,12 @@ function Index() {
             Informe o produto, a categoria e a quantidade atual para saber se é hora de
             solicitar reposição.
           </p>
+          <Link
+            to="/calculadora"
+            className="mt-6 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium transition-all hover:border-primary hover:bg-primary/10"
+          >
+            🧮 Abrir Calculadora estilo Windows
+          </Link>
         </header>
 
         <section className="mb-8 grid grid-cols-3 gap-3">
