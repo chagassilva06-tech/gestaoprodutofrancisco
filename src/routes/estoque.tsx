@@ -73,10 +73,15 @@ function Estoque() {
   // Valores digitados em cada campo "completar estoque"
   const [reposicoes, setReposicoes] = useState<Record<string, string>>({});
 
-  const completarEstoque = (codigo: string) => {
+  const ajustarEstoque = (codigo: string, minimo: number, sinal: 1 | -1) => {
     const valor = Number(reposicoes[codigo]);
     if (!Number.isFinite(valor) || valor <= 0) return;
-    setQuantidades((prev) => ({ ...prev, [codigo]: (prev[codigo] ?? 0) + valor }));
+    setQuantidades((prev) => {
+      const atual = prev[codigo] ?? 0;
+      // Não permite passar do mínimo padronizado nem ficar abaixo de 0
+      const novo = Math.max(0, Math.min(minimo, atual + sinal * valor));
+      return { ...prev, [codigo]: novo };
+    });
     setReposicoes((prev) => ({ ...prev, [codigo]: "" }));
   };
 
@@ -347,17 +352,26 @@ function Estoque() {
                               }))
                             }
                             onKeyDown={(e) => {
-                              if (e.key === "Enter") completarEstoque(p.codigo);
+                              if (e.key === "Enter") ajustarEstoque(p.codigo, p.minimo, 1);
                             }}
                             placeholder="Qtd."
                             className="h-8 w-24 rounded-md border border-input bg-background px-2 text-xs outline-none transition focus:border-primary focus:ring-1 focus:ring-ring/40"
                           />
                           <button
                             type="button"
-                            onClick={() => completarEstoque(p.codigo)}
-                            className="h-8 rounded-md border border-primary/40 bg-primary/10 px-3 text-xs font-semibold text-foreground transition hover:bg-primary/20"
+                            onClick={() => ajustarEstoque(p.codigo, p.minimo, 1)}
+                            disabled={atual >= p.minimo}
+                            className="h-8 rounded-md border border-primary/40 bg-primary/10 px-3 text-xs font-semibold text-foreground transition hover:bg-primary/20 disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             ➕ {baixo ? "Completar estoque" : "Adicionar quantidade"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => ajustarEstoque(p.codigo, p.minimo, -1)}
+                            disabled={atual <= 0}
+                            className="h-8 rounded-md border border-warning/40 bg-warning/10 px-3 text-xs font-semibold text-foreground transition hover:bg-warning/20 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            ➖ Diminuir quantidade
                           </button>
                           <button
                             type="button"
@@ -372,6 +386,7 @@ function Estoque() {
                             Preencher mínimo
                           </button>
                         </div>
+
 
                       </div>
                       <span
