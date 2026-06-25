@@ -109,7 +109,7 @@ function Estoque() {
   }, [busca, filtroCard]);
 
   const totalProdutos = PRODUTOS.length;
-  const totalItens = PRODUTOS.reduce((soma, p) => soma + p.quantidade, 0);
+  const totalItens = Object.values(quantidades).reduce((soma, q) => soma + q, 0);
 
 
   return (
