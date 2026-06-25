@@ -274,7 +274,8 @@ function Estoque() {
           ) : (
             <ul className="grid gap-3">
               {resultados.map((p) => {
-                const baixo = p.quantidade < p.minimo;
+                const atual = quantidades[p.codigo] ?? p.quantidade;
+                const baixo = atual < p.minimo;
                 return (
                   <li
                     key={p.codigo}
@@ -301,14 +302,58 @@ function Estoque() {
                                 baixo ? "bg-warning" : "bg-primary"
                               }`}
                               style={{
-                                width: `${Math.min(100, (p.quantidade / p.minimo) * 100)}%`,
+                                width: `${Math.min(100, (atual / p.minimo) * 100)}%`,
                               }}
                             />
                           </div>
                           <span className="text-xs text-muted-foreground">
-                            {p.quantidade} / mín. {p.minimo} un.
+                            {atual} / mín. {p.minimo} un.
                           </span>
                         </div>
+
+                        {/* Completar estoque (apenas quando abaixo do mínimo) */}
+                        {baixo && (
+                          <div className="mt-3 flex flex-wrap items-center gap-2 rounded-lg border border-warning/30 bg-warning/5 p-2">
+                            <span className="text-xs font-medium text-warning-foreground">
+                              Faltam {p.minimo - atual} un.
+                            </span>
+                            <input
+                              type="number"
+                              min={1}
+                              value={reposicoes[p.codigo] ?? ""}
+                              onChange={(e) =>
+                                setReposicoes((prev) => ({
+                                  ...prev,
+                                  [p.codigo]: e.target.value,
+                                }))
+                              }
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") completarEstoque(p.codigo);
+                              }}
+                              placeholder="Qtd."
+                              className="h-8 w-24 rounded-md border border-input bg-background px-2 text-xs outline-none transition focus:border-primary focus:ring-1 focus:ring-ring/40"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => completarEstoque(p.codigo)}
+                              className="h-8 rounded-md border border-primary/40 bg-primary/10 px-3 text-xs font-semibold text-foreground transition hover:bg-primary/20"
+                            >
+                              ➕ Completar estoque
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setReposicoes((prev) => ({
+                                  ...prev,
+                                  [p.codigo]: String(p.minimo - atual),
+                                }))
+                              }
+                              className="h-8 rounded-md px-2 text-xs text-muted-foreground transition hover:text-foreground"
+                            >
+                              Preencher mínimo
+                            </button>
+                          </div>
+                        )}
                       </div>
                       <span
                         className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${
