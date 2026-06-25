@@ -195,6 +195,20 @@ function Estoque() {
           })}
         </section>
 
+        {/* Botão carregar tudo */}
+        <div className="mb-8 flex justify-center">
+          <button
+            type="button"
+            onClick={() => {
+              setFiltroCard(null);
+              setBusca("");
+            }}
+            className="rounded-xl border border-primary/40 bg-card px-6 py-3 text-sm font-semibold text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/70 hover:bg-primary/10 hover:shadow-[0_0_28px_-4px_var(--color-primary)]"
+          >
+            📦 Carregar tudo
+          </button>
+        </div>
+
         {/* Resultados */}
         <section className="rounded-2xl border border-border bg-card p-4 shadow-lg shadow-black/20 sm:p-6">
           <div className="mb-4 flex items-center justify-between">
