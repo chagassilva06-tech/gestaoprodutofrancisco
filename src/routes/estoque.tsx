@@ -276,6 +276,7 @@ function Estoque() {
               {resultados.map((p) => {
                 const atual = quantidades[p.codigo] ?? p.quantidade;
                 const baixo = atual < p.minimo;
+                const acima = atual > p.minimo;
                 return (
                   <li
                     key={p.codigo}
@@ -314,20 +315,27 @@ function Estoque() {
                         {/* Completar / ajustar estoque (sempre disponível) */}
                         <div
                           className={`mt-3 flex flex-wrap items-center gap-2 rounded-lg border p-2 ${
-                            baixo
+                            baixo || acima
                               ? "border-warning/30 bg-warning/5"
                               : "border-primary/30 bg-primary/5"
                           }`}
                         >
                           <span
                             className={`text-xs font-medium ${
-                              baixo ? "text-warning-foreground" : "text-foreground"
+                              baixo
+                                ? "text-warning-foreground"
+                                : acima
+                                  ? "text-warning-foreground"
+                                  : "text-foreground"
                             }`}
                           >
                             {baixo
                               ? `Faltam ${p.minimo - atual} un.`
-                              : "✅ Estoque completo (100%)"}
+                              : acima
+                                ? `⚠️ Estoque ${Math.round((atual / p.minimo) * 100)}% (excedeu em ${atual - p.minimo} un.) — insira apenas o mínimo (${p.minimo} un.)`
+                                : "✅ Estoque completo (100%)"}
                           </span>
+
                           <input
                             type="number"
                             min={1}
