@@ -241,7 +241,7 @@ function Estoque() {
         </section>
 
         {/* Botão carregar tudo */}
-        <div className="mb-8 flex justify-center">
+        <div className="mb-8 flex justify-end">
           <button
             type="button"
             onClick={() => {
