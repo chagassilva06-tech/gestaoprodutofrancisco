@@ -65,6 +65,7 @@ const CARDS: { titulo: string; icon: string; termo: string }[] = [
 function Estoque() {
   const [busca, setBusca] = useState("");
   const [filtroCard, setFiltroCard] = useState<string | null>(null);
+  const [filtroRepor, setFiltroRepor] = useState<"repor" | "ok" | null>(null);
   const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
   // Quantidades atuais (com ajustes manuais aplicados)
   const [quantidades, setQuantidades] = useState<Record<string, number>>(
@@ -109,9 +110,17 @@ function Estoque() {
         p.fabricante.toLowerCase().includes(termo) ||
         p.tipo.toLowerCase().includes(termo) ||
         p.produto.toLowerCase().includes(termo);
-      return matchCard && matchBusca;
+      const atual = quantidades[p.codigo] ?? p.quantidade;
+      const precisaRepor = atual < p.minimo;
+      const matchRepor =
+        filtroRepor === null
+          ? true
+          : filtroRepor === "repor"
+            ? precisaRepor
+            : !precisaRepor;
+      return matchCard && matchBusca && matchRepor;
     });
-  }, [busca, filtroCard]);
+  }, [busca, filtroCard, filtroRepor, quantidades]);
 
   const totalProdutos = PRODUTOS.length;
   const totalItens = Object.values(quantidades).reduce((soma, q) => soma + q, 0);
@@ -126,7 +135,7 @@ function Estoque() {
             Controle de Inventário
           </span>
           <h1 className="mt-5 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-            Gestão Estoque Mínimo
+            Gestão de Produto
           </h1>
           <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
             Busque por código, fabricante, tipo ou produto e veja quais itens precisam de
@@ -245,12 +254,35 @@ function Estoque() {
           })}
         </section>
 
-        {/* Botão carregar tudo */}
-        <div className="mb-8 flex justify-end">
+        {/* Botões de ação / filtros */}
+        <div className="mb-8 flex flex-wrap justify-end gap-3">
+          <button
+            type="button"
+            onClick={() => setFiltroRepor(filtroRepor === "repor" ? null : "repor")}
+            className={`rounded-xl border px-6 py-3 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 ${
+              filtroRepor === "repor"
+                ? "border-red-600 bg-red-950/40 text-red-200 shadow-[0_0_28px_-2px_rgba(153,27,27,0.9)]"
+                : "border-red-900/50 bg-card text-foreground shadow-[0_0_18px_-6px_rgba(153,27,27,0.8)] hover:border-red-700 hover:bg-red-950/20 hover:shadow-[0_0_28px_-4px_rgba(153,27,27,0.9)]"
+            }`}
+          >
+            🔴 Precisa repor
+          </button>
+          <button
+            type="button"
+            onClick={() => setFiltroRepor(filtroRepor === "ok" ? null : "ok")}
+            className={`rounded-xl border px-6 py-3 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 ${
+              filtroRepor === "ok"
+                ? "border-primary bg-primary/15 text-foreground shadow-[0_0_28px_-2px_var(--color-primary)]"
+                : "border-primary/40 bg-card text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] hover:border-primary/70 hover:bg-primary/10 hover:shadow-[0_0_28px_-4px_var(--color-primary)]"
+            }`}
+          >
+            ✅ Não precisa repor
+          </button>
           <button
             type="button"
             onClick={() => {
               setFiltroCard(null);
+              setFiltroRepor(null);
               setBusca("");
             }}
             className="rounded-xl border border-primary/40 bg-card px-6 py-3 text-sm font-semibold text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/70 hover:bg-primary/10 hover:shadow-[0_0_28px_-4px_var(--color-primary)]"
@@ -258,6 +290,7 @@ function Estoque() {
             📦 Carregar tudo
           </button>
         </div>
+
 
         {/* Resultados */}
         <section className="rounded-2xl border border-border bg-card p-4 shadow-lg shadow-black/20 sm:p-6">
@@ -285,8 +318,13 @@ function Estoque() {
                 return (
                   <li
                     key={p.codigo}
-                    className="rounded-xl border border-primary/20 bg-background p-4 transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_22px_-6px_var(--color-primary)]"
+                    className={`rounded-xl border bg-background p-4 transition-all duration-300 ${
+                      baixo
+                        ? "border-red-700/60 shadow-[0_0_24px_-2px_rgba(153,27,27,0.85)] hover:border-red-600 hover:shadow-[0_0_32px_0px_rgba(153,27,27,0.95)]"
+                        : "border-primary/20 hover:border-primary/50 hover:shadow-[0_0_22px_-6px_var(--color-primary)]"
+                    }`}
                   >
+
                     <div className="flex items-start gap-4">
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
