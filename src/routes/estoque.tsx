@@ -170,60 +170,75 @@ function Estoque() {
 
         {/* Campo de busca */}
         <div className="mb-8">
-          <div className="relative">
-            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-lg text-muted-foreground">
-              🔎
-            </span>
-            <input
-              type="search"
-              value={busca}
-              onChange={(e) => {
-                setBusca(e.target.value);
-                setMostrarSugestoes(true);
-              }}
-              onFocus={() => setMostrarSugestoes(true)}
-              onBlur={() => setTimeout(() => setMostrarSugestoes(false), 150)}
-              placeholder="Buscar por código, fabricante, tipo ou produto…"
-              autoComplete="off"
-              className="w-full rounded-xl border border-input bg-card px-12 py-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/40"
-            />
-            {busca && (
-              <button
-                type="button"
-                onClick={() => setBusca("")}
-                aria-label="Limpar busca"
-                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md px-2 py-1 text-sm text-muted-foreground transition hover:text-foreground"
-              >
-                ✕
-              </button>
-            )}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              setMostrarSugestoes(false);
+            }}
+            className="flex flex-col gap-3 sm:flex-row sm:items-stretch"
+          >
+            <div className="relative flex-1">
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-lg text-muted-foreground">
+                🔎
+              </span>
+              <input
+                type="search"
+                value={busca}
+                onChange={(e) => {
+                  setBusca(e.target.value);
+                  setMostrarSugestoes(true);
+                }}
+                onFocus={() => setMostrarSugestoes(true)}
+                onBlur={() => setTimeout(() => setMostrarSugestoes(false), 150)}
+                placeholder="Buscar por código, fabricante, tipo ou produto…"
+                autoComplete="off"
+                className="w-full rounded-xl border border-input bg-card px-12 py-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/40"
+              />
+              {busca && (
+                <button
+                  type="button"
+                  onClick={() => setBusca("")}
+                  aria-label="Limpar busca"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md px-2 py-1 text-sm text-muted-foreground transition hover:text-foreground"
+                >
+                  ✕
+                </button>
+              )}
 
-            {/* Sugestões de autocompletar */}
-            {mostrarSugestoes && sugestoes.length > 0 && (
-              <ul className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-primary/40 bg-card shadow-[0_0_20px_-4px_var(--color-primary)] animate-fade-in">
-                {sugestoes.map((s) => (
-                  <li key={s}>
-                    <button
-                      type="button"
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        setBusca(s);
-                        setMostrarSugestoes(false);
-                      }}
-                      className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition hover:bg-primary/10"
-                    >
-                      <span className="text-muted-foreground">🔎</span>
-                      <span>{s}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+              {/* Sugestões de autocompletar */}
+              {mostrarSugestoes && sugestoes.length > 0 && (
+                <ul className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-primary/40 bg-card shadow-[0_0_20px_-4px_var(--color-primary)] animate-fade-in">
+                  {sugestoes.map((s) => (
+                    <li key={s}>
+                      <button
+                        type="button"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          setBusca(s);
+                          setMostrarSugestoes(false);
+                        }}
+                        className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition hover:bg-primary/10"
+                      >
+                        <span className="text-muted-foreground">🔎</span>
+                        <span>{s}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <button
+              type="submit"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-primary bg-primary px-6 py-4 text-sm font-semibold text-primary-foreground shadow-[0_0_18px_-6px_var(--color-primary)] transition hover:opacity-90"
+            >
+              🔎 Buscar
+            </button>
+          </form>
           <p className="mt-2 px-1 text-xs text-muted-foreground">
             Filtra por: Código • Fabricante • Tipo • Produto
           </p>
         </div>
+
 
         {/* Card resumo do estoque */}
         <div className="mb-6 flex flex-wrap items-center justify-center gap-3 rounded-xl border border-primary/30 bg-card px-5 py-4 shadow-[0_0_18px_-6px_var(--color-primary)] sm:justify-between">
