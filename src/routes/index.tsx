@@ -49,7 +49,7 @@ function Index() {
             Área restrita
           </span>
           <h1 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-4xl">
-            Acessar Estoque
+            Product Management
           </h1>
           <p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
             Informe a senha de acesso para abrir o Verificador de Estoque Mínimo.
