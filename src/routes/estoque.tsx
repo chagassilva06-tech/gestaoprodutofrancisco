@@ -276,6 +276,7 @@ function Estoque() {
               {resultados.map((p) => {
                 const atual = quantidades[p.codigo] ?? p.quantidade;
                 const baixo = atual < p.minimo;
+                const acima = atual > p.minimo;
                 return (
                   <li
                     key={p.codigo}
