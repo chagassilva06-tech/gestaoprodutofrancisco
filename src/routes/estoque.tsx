@@ -65,6 +65,7 @@ const CARDS: { titulo: string; icon: string; termo: string }[] = [
 function Estoque() {
   const [busca, setBusca] = useState("");
   const [filtroCard, setFiltroCard] = useState<string | null>(null);
+  const [filtroRepor, setFiltroRepor] = useState<"repor" | "ok" | null>(null);
   const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
   // Quantidades atuais (com ajustes manuais aplicados)
   const [quantidades, setQuantidades] = useState<Record<string, number>>(
