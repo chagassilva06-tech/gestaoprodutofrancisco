@@ -169,6 +169,34 @@ function Estoque() {
           </p>
         </div>
 
+        {/* Card resumo do estoque */}
+        <div className="mb-6 flex flex-wrap items-center justify-center gap-3 rounded-xl border border-primary/30 bg-card px-5 py-4 shadow-[0_0_18px_-6px_var(--color-primary)] sm:justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">📦</span>
+            <div>
+              <div className="font-display text-sm font-semibold text-foreground">
+                Resumo do estoque
+              </div>
+              <div className="text-xs text-muted-foreground">Itens cadastrados no momento</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-6">
+            <div className="text-center">
+              <div className="font-display text-2xl font-bold text-primary">
+                {totalProdutos}
+              </div>
+              <div className="text-xs text-muted-foreground">Produtos</div>
+            </div>
+            <div className="h-8 w-px bg-border" />
+            <div className="text-center">
+              <div className="font-display text-2xl font-bold text-primary">
+                {totalItens.toLocaleString("pt-BR")}
+              </div>
+              <div className="text-xs text-muted-foreground">Itens (un.)</div>
+            </div>
+          </div>
+        </div>
+
         {/* 4 cards principais por produto */}
         <section className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {CARDS.map((c) => {
