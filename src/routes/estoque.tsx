@@ -318,8 +318,13 @@ function Estoque() {
                 return (
                   <li
                     key={p.codigo}
-                    className="rounded-xl border border-primary/20 bg-background p-4 transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_22px_-6px_var(--color-primary)]"
+                    className={`rounded-xl border bg-background p-4 transition-all duration-300 ${
+                      baixo
+                        ? "border-red-700/60 shadow-[0_0_24px_-2px_rgba(153,27,27,0.85)] hover:border-red-600 hover:shadow-[0_0_32px_0px_rgba(153,27,27,0.95)]"
+                        : "border-primary/20 hover:border-primary/50 hover:shadow-[0_0_22px_-6px_var(--color-primary)]"
+                    }`}
                   >
+
                     <div className="flex items-start gap-4">
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
