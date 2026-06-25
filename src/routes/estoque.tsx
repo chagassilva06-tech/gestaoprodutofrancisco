@@ -254,12 +254,35 @@ function Estoque() {
           })}
         </section>
 
-        {/* Botão carregar tudo */}
-        <div className="mb-8 flex justify-end">
+        {/* Botões de ação / filtros */}
+        <div className="mb-8 flex flex-wrap justify-end gap-3">
+          <button
+            type="button"
+            onClick={() => setFiltroRepor(filtroRepor === "repor" ? null : "repor")}
+            className={`rounded-xl border px-6 py-3 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 ${
+              filtroRepor === "repor"
+                ? "border-red-600 bg-red-950/40 text-red-200 shadow-[0_0_28px_-2px_rgba(153,27,27,0.9)]"
+                : "border-red-900/50 bg-card text-foreground shadow-[0_0_18px_-6px_rgba(153,27,27,0.8)] hover:border-red-700 hover:bg-red-950/20 hover:shadow-[0_0_28px_-4px_rgba(153,27,27,0.9)]"
+            }`}
+          >
+            🔴 Precisa repor
+          </button>
+          <button
+            type="button"
+            onClick={() => setFiltroRepor(filtroRepor === "ok" ? null : "ok")}
+            className={`rounded-xl border px-6 py-3 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 ${
+              filtroRepor === "ok"
+                ? "border-primary bg-primary/15 text-foreground shadow-[0_0_28px_-2px_var(--color-primary)]"
+                : "border-primary/40 bg-card text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] hover:border-primary/70 hover:bg-primary/10 hover:shadow-[0_0_28px_-4px_var(--color-primary)]"
+            }`}
+          >
+            ✅ Não precisa repor
+          </button>
           <button
             type="button"
             onClick={() => {
               setFiltroCard(null);
+              setFiltroRepor(null);
               setBusca("");
             }}
             className="rounded-xl border border-primary/40 bg-card px-6 py-3 text-sm font-semibold text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/70 hover:bg-primary/10 hover:shadow-[0_0_28px_-4px_var(--color-primary)]"
@@ -267,6 +290,7 @@ function Estoque() {
             📦 Carregar tudo
           </button>
         </div>
+
 
         {/* Resultados */}
         <section className="rounded-2xl border border-border bg-card p-4 shadow-lg shadow-black/20 sm:p-6">
