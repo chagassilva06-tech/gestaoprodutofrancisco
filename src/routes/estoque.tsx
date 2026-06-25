@@ -65,6 +65,19 @@ const CARDS: { titulo: string; icon: string; termo: string }[] = [
 function Estoque() {
   const [busca, setBusca] = useState("");
   const [filtroCard, setFiltroCard] = useState<string | null>(null);
+  const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
+
+  const sugestoes = useMemo(() => {
+    const termo = busca.trim().toLowerCase();
+    if (termo === "") return [];
+    const valores = new Set<string>();
+    for (const p of PRODUTOS) {
+      for (const campo of [p.produto, p.fabricante, p.tipo, p.codigo]) {
+        if (campo.toLowerCase().includes(termo)) valores.add(campo);
+      }
+    }
+    return Array.from(valores).slice(0, 6);
+  }, [busca]);
 
   const resultados = useMemo(() => {
     const termo = busca.trim().toLowerCase();
