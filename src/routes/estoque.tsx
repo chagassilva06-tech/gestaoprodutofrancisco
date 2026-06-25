@@ -219,7 +219,7 @@ function Estoque() {
                 return (
                   <li
                     key={p.codigo}
-                    className="rounded-xl border border-border bg-background p-4"
+                    className="rounded-xl border border-primary/20 bg-background p-4 transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_22px_-6px_var(--color-primary)]"
                   >
                     <div className="flex items-start gap-4">
                       <div className="min-w-0 flex-1">
