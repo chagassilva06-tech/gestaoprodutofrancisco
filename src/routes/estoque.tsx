@@ -95,6 +95,10 @@ function Estoque() {
     });
   }, [busca, filtroCard]);
 
+  const totalProdutos = PRODUTOS.length;
+  const totalItens = PRODUTOS.reduce((soma, p) => soma + p.quantidade, 0);
+
+
   return (
     <div className="min-h-screen bg-background px-4 py-10 sm:py-16">
       <div className="mx-auto w-full max-w-4xl">
