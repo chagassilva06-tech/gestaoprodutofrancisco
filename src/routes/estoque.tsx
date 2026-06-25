@@ -86,6 +86,16 @@ function Estoque() {
     setReposicoes((prev) => ({ ...prev, [codigo]: "" }));
   };
 
+  const zerarEstoque = () => {
+    if (
+      !window.confirm(
+        "Tem certeza que deseja zerar o estoque de TODOS os produtos cadastrados? Esta ação não pode ser desfeita.",
+      )
+    )
+      return;
+    setQuantidades(Object.fromEntries(PRODUTOS.map((p) => [p.codigo, 0])));
+  };
+
   const sugestoes = useMemo(() => {
     const termo = busca.trim().toLowerCase();
     if (termo === "") return [];
