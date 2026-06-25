@@ -86,6 +86,16 @@ function Estoque() {
     setReposicoes((prev) => ({ ...prev, [codigo]: "" }));
   };
 
+  const zerarEstoque = () => {
+    if (
+      !window.confirm(
+        "Tem certeza que deseja zerar o estoque de TODOS os produtos cadastrados? Esta ação não pode ser desfeita.",
+      )
+    )
+      return;
+    setQuantidades(Object.fromEntries(PRODUTOS.map((p) => [p.codigo, 0])));
+  };
+
   const sugestoes = useMemo(() => {
     const termo = busca.trim().toLowerCase();
     if (termo === "") return [];
@@ -288,6 +298,13 @@ function Estoque() {
             className="rounded-xl border border-primary/40 bg-card px-6 py-3 text-sm font-semibold text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/70 hover:bg-primary/10 hover:shadow-[0_0_28px_-4px_var(--color-primary)]"
           >
             📦 Carregar tudo
+          </button>
+          <button
+            type="button"
+            onClick={zerarEstoque}
+            className="rounded-xl border border-red-600 bg-red-950/40 px-6 py-3 text-sm font-semibold text-red-200 shadow-[0_0_18px_-6px_rgba(153,27,27,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:border-red-500 hover:bg-red-900/50 hover:shadow-[0_0_28px_-2px_rgba(153,27,27,0.95)]"
+          >
+            🗑️ Zerar estoque
           </button>
         </div>
 
