@@ -452,6 +452,14 @@ function Estoque() {
                           </button>
                           <button
                             type="button"
+                            onClick={() => completarMinimo(p.codigo, p.minimo)}
+                            disabled={atual >= p.minimo}
+                            className="h-8 rounded-md border border-primary bg-primary/15 px-3 text-xs font-semibold text-foreground transition hover:bg-primary/25 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            ✅ Completar ao mínimo ({p.minimo})
+                          </button>
+                          <button
+                            type="button"
                             onClick={() =>
                               setReposicoes((prev) => ({
                                 ...prev,
