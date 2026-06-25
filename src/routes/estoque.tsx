@@ -160,7 +160,7 @@ function Estoque() {
             Controle de Inventário
           </span>
           <h1 className="mt-5 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-            Gestão de Produto
+            Gestão de produtos
           </h1>
           <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
             Busque por código, fabricante, tipo ou produto e veja quais itens precisam de
