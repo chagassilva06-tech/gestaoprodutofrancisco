@@ -25,6 +25,7 @@ const PASSWORD = "1234";
 
 function Index() {
   const navigate = useNavigate();
+  const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const [error, setError] = useState(false);
@@ -44,23 +45,41 @@ function Index() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
       <div className="w-full max-w-sm">
         <header className="mb-8 text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-muted-foreground">
-            <span className="h-2 w-2 rounded-full bg-primary" />
+          <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-card px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-primary shadow-[0_0_18px_-6px_var(--color-primary)]">
+            <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />
             Área restrita
           </span>
           <h1 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-4xl">
             Product Management
           </h1>
           <p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
-            Informe a senha de acesso para abrir o Verificador de Estoque Mínimo.
+            Informe seus dados de acesso para abrir o Verificador de Estoque Mínimo.
           </p>
         </header>
 
         <form
           onSubmit={handleSubmit}
-          className="rounded-2xl border border-border bg-card p-6 shadow-lg shadow-black/20 sm:p-8"
+          className="rounded-2xl border border-primary/40 bg-card p-6 shadow-[0_0_40px_-12px_var(--color-primary)] transition-shadow duration-300 hover:shadow-[0_0_55px_-8px_var(--color-primary)] sm:p-8"
         >
           <div className="grid gap-5">
+            <div>
+              <label htmlFor="user" className="mb-2 block text-sm font-medium">
+                Usuário
+              </label>
+              <input
+                id="user"
+                type="text"
+                value={user}
+                onChange={(e) => {
+                  setUser(e.target.value);
+                  if (error) setError(false);
+                }}
+                placeholder="Digite o usuário"
+                autoComplete="username"
+                className="w-full rounded-lg border border-primary/30 bg-background px-4 py-3 text-sm outline-none transition focus:border-primary focus:shadow-[0_0_18px_-4px_var(--color-primary)] focus:ring-2 focus:ring-ring/40"
+              />
+            </div>
+
             <div>
               <label htmlFor="password" className="mb-2 block text-sm font-medium">
                 Senha
@@ -75,7 +94,8 @@ function Index() {
                     if (error) setError(false);
                   }}
                   placeholder="Digite a senha"
-                  className="w-full rounded-lg border border-input bg-background px-4 py-3 pr-12 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/40"
+                  autoComplete="current-password"
+                  className="w-full rounded-lg border border-primary/30 bg-background px-4 py-3 pr-12 text-sm outline-none transition focus:border-primary focus:shadow-[0_0_18px_-4px_var(--color-primary)] focus:ring-2 focus:ring-ring/40"
                 />
                 <button
                   type="button"
@@ -96,7 +116,7 @@ function Index() {
 
             <button
               type="submit"
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90 active:scale-[0.99]"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-[0_0_24px_-6px_var(--color-primary)] transition hover:opacity-90 hover:shadow-[0_0_32px_-4px_var(--color-primary)] active:scale-[0.99]"
             >
               Acessar Estoque →
             </button>
