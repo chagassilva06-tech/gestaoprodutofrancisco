@@ -133,6 +133,9 @@ function Index() {
         <p className="mt-6 text-center text-xs text-muted-foreground">
           Acesso protegido por usuário e senha
         </p>
+        <p className="mt-2 text-center text-xs text-muted-foreground">
+          By Francisco Chagas — todos os direitos reservados 2026
+        </p>
       </div>
     </div>
   );
