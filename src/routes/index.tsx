@@ -61,7 +61,7 @@ function Index() {
 
         <form
           onSubmit={handleSubmit}
-          className="rounded-[2rem] bg-background p-8 shadow-[12px_12px_28px_rgba(0,0,0,0.55),-10px_-10px_24px_rgba(255,255,255,0.04)] sm:p-10"
+          className="rounded-[2rem] border border-transparent bg-background p-8 shadow-[12px_12px_28px_rgba(0,0,0,0.55),-10px_-10px_24px_rgba(255,255,255,0.04)] transition-all duration-500 ease-out hover:border-white/30 hover:shadow-[12px_12px_28px_rgba(0,0,0,0.55),-10px_-10px_24px_rgba(255,255,255,0.04),0_0_24px_rgba(255,255,255,0.12)] sm:p-10"
         >
           <div className="grid gap-7">
             <div>
