@@ -155,10 +155,13 @@ function Estoque() {
     <div className="min-h-screen bg-background px-4 py-10 sm:py-16">
       <div className="mx-auto w-full max-w-4xl">
         <header className="mb-10 text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-muted-foreground">
-            <span className="h-2 w-2 rounded-full bg-primary" />
+          <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-card px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-primary shadow-[0_0_18px_-6px_var(--color-primary)]">
+            <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />
             Controle de Inventário
           </span>
+          <p className="mt-2 text-xs font-medium tracking-wide text-muted-foreground">
+            By Francisco Chagas
+          </p>
           <h1 className="mt-5 font-display text-4xl font-bold tracking-tight sm:text-5xl">
             Gestão de produtos
           </h1>
@@ -506,8 +509,11 @@ function Estoque() {
           )}
         </section>
 
-        <footer className="mt-10 text-center text-xs text-muted-foreground">
-          <Link to="/" className="underline-offset-4 hover:underline">
+        <footer className="mt-10 text-center">
+          <Link
+            to="/"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-primary/40 bg-card px-6 py-3 text-sm font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] transition hover:bg-primary/10 hover:shadow-[0_0_32px_-6px_var(--color-primary)] active:scale-[0.99]"
+          >
             ← Voltar à tela de acesso
           </Link>
         </footer>
