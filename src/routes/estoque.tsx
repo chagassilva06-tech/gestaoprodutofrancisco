@@ -509,8 +509,11 @@ function Estoque() {
           )}
         </section>
 
-        <footer className="mt-10 text-center text-xs text-muted-foreground">
-          <Link to="/" className="underline-offset-4 hover:underline">
+        <footer className="mt-10 text-center">
+          <Link
+            to="/"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-primary/40 bg-card px-6 py-3 text-sm font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] transition hover:bg-primary/10 hover:shadow-[0_0_32px_-6px_var(--color-primary)] active:scale-[0.99]"
+          >
             ← Voltar à tela de acesso
           </Link>
         </footer>
