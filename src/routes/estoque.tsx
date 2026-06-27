@@ -509,14 +509,22 @@ function Estoque() {
           )}
         </section>
 
-        <footer className="mt-10 text-center">
+        <footer className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <button
+            type="button"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-primary/40 bg-card px-6 py-3 text-sm font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] transition hover:bg-primary/10 hover:shadow-[0_0_32px_-6px_var(--color-primary)] active:scale-[0.99] sm:w-auto"
+          >
+            ↑ Voltar ao Início
+          </button>
           <Link
             to="/"
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-primary/40 bg-card px-6 py-3 text-sm font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] transition hover:bg-primary/10 hover:shadow-[0_0_32px_-6px_var(--color-primary)] active:scale-[0.99]"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-primary/40 bg-card px-6 py-3 text-sm font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] transition hover:bg-primary/10 hover:shadow-[0_0_32px_-6px_var(--color-primary)] active:scale-[0.99] sm:w-auto"
           >
             ← Voltar à tela de acesso
           </Link>
         </footer>
+
       </div>
     </div>
   );
