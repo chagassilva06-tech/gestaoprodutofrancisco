@@ -14,7 +14,119 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      categories: {
+        Row: {
+          created_at: string
+          icon: string
+          id: string
+          nome: string
+          termo: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          icon?: string
+          id?: string
+          nome: string
+          termo?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string
+          id?: string
+          nome?: string
+          termo?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          codigo: string
+          created_at: string
+          fabricante: string
+          id: string
+          minimo: number
+          produto: string
+          quantidade: number
+          tipo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          codigo?: string
+          created_at?: string
+          fabricante?: string
+          id?: string
+          minimo?: number
+          produto: string
+          quantidade?: number
+          tipo?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          codigo?: string
+          created_at?: string
+          fabricante?: string
+          id?: string
+          minimo?: number
+          produto?: string
+          quantidade?: number
+          tipo?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      stock_movements: {
+        Row: {
+          acao: string
+          codigo: string
+          created_at: string
+          delta: number
+          id: string
+          product_id: string | null
+          produto_nome: string
+          quantidade_anterior: number
+          quantidade_nova: number
+          user_id: string
+        }
+        Insert: {
+          acao?: string
+          codigo?: string
+          created_at?: string
+          delta?: number
+          id?: string
+          product_id?: string | null
+          produto_nome?: string
+          quantidade_anterior?: number
+          quantidade_nova?: number
+          user_id: string
+        }
+        Update: {
+          acao?: string
+          codigo?: string
+          created_at?: string
+          delta?: number
+          id?: string
+          product_id?: string | null
+          produto_nome?: string
+          quantidade_anterior?: number
+          quantidade_nova?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_movements_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
