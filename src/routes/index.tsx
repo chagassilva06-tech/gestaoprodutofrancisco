@@ -1,45 +1,89 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { User, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, UserPlus } from "lucide-react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/")({
+  ssr: false,
   head: () => ({
     meta: [
-      { title: "Acesso — Verificador de Estoque Mínimo" },
+      { title: "Acesso — Controle de Inventário" },
       {
         name: "description",
         content:
-          "Tela de acesso ao Verificador de Estoque Mínimo. Informe usuário e senha para entrar.",
+          "Tela de acesso ao Controle de Inventário. Informe e-mail e senha para entrar na nuvem.",
       },
-      { property: "og:title", content: "Acesso — Verificador de Estoque Mínimo" },
+      { property: "og:title", content: "Acesso — Controle de Inventário" },
       {
         property: "og:description",
         content:
-          "Tela de acesso ao Verificador de Estoque Mínimo. Informe usuário e senha para entrar.",
+          "Tela de acesso ao Controle de Inventário. Informe e-mail e senha para entrar na nuvem.",
       },
     ],
   }),
   component: Index,
 });
 
-const USERNAME = "Francisco";
-const PASSWORD = "35540033";
-
 function Index() {
   const navigate = useNavigate();
-  const [user, setUser] = useState("");
+  const { session, loading } = useAuth();
+  const [modo, setModo] = useState<"entrar" | "criar">("entrar");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
-  const [error, setError] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  useEffect(() => {
+    if (!loading && session) navigate({ to: "/estoque" });
+  }, [loading, session, navigate]);
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-
-    if (user.trim() === USERNAME && password === PASSWORD) {
-      setError(false);
-      navigate({ to: "/estoque" });
-    } else {
-      setError(true);
+    if (busy) return;
+    const mail = email.trim();
+    if (!mail || !password) {
+      toast.error("Informe e-mail e senha.");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("A senha deve ter pelo menos 6 caracteres.");
+      return;
+    }
+    setBusy(true);
+    try {
+      if (modo === "criar") {
+        const { data, error } = await supabase.auth.signUp({
+          email: mail,
+          password,
+          options: { emailRedirectTo: window.location.origin },
+        });
+        if (error) throw error;
+        if (data.session) {
+          toast.success("Conta criada! Entrando…");
+          navigate({ to: "/estoque" });
+        } else {
+          toast.success("Conta criada! Verifique seu e-mail para confirmar e depois entre.");
+          setModo("entrar");
+        }
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email: mail, password });
+        if (error) throw error;
+        toast.success("Acesso liberado!");
+        navigate({ to: "/estoque" });
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Falha na autenticação.";
+      toast.error(
+        msg.includes("Invalid login credentials")
+          ? "E-mail ou senha incorretos."
+          : msg.includes("already registered")
+            ? "Este e-mail já está cadastrado. Faça login."
+            : msg,
+      );
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -55,7 +99,9 @@ function Index() {
             Product Management
           </h1>
           <p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
-            Informe seu usuário e senha para abrir o Verificador de Estoque Mínimo.
+            {modo === "entrar"
+              ? "Informe seu e-mail e senha para abrir o Controle de Inventário na nuvem."
+              : "Crie sua conta para salvar o estoque na nuvem e acessar de qualquer aparelho."}
           </p>
         </header>
 
@@ -63,23 +109,38 @@ function Index() {
           onSubmit={handleSubmit}
           className="rounded-[2rem] border border-transparent bg-background p-8 shadow-[12px_12px_28px_rgba(0,0,0,0.55),-10px_-10px_24px_rgba(255,255,255,0.04)] transition-all duration-500 ease-out hover:border-white/30 hover:shadow-[12px_12px_28px_rgba(0,0,0,0.55),-10px_-10px_24px_rgba(255,255,255,0.04),0_0_24px_rgba(255,255,255,0.12)] sm:p-10"
         >
+          {/* Alternância Entrar / Criar conta */}
+          <div className="mb-7 grid grid-cols-2 gap-2 rounded-2xl bg-background p-1.5 shadow-[inset_4px_4px_10px_rgba(0,0,0,0.5),inset_-4px_-4px_10px_rgba(255,255,255,0.04)]">
+            {(["entrar", "criar"] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setModo(m)}
+                className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
+                  modo === m
+                    ? "bg-gradient-to-br from-primary to-success text-primary-foreground shadow-[0_0_18px_-6px_var(--color-primary)]"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {m === "entrar" ? "Entrar" : "Criar conta"}
+              </button>
+            ))}
+          </div>
+
           <div className="grid gap-7">
             <div>
-              <label htmlFor="user" className="mb-2 block text-sm font-medium">
-                Usuário
+              <label htmlFor="email" className="mb-2 block text-sm font-medium">
+                E-mail
               </label>
               <div className="flex items-center gap-3 rounded-2xl bg-background px-4 py-1 shadow-[inset_6px_6px_12px_rgba(0,0,0,0.55),inset_-6px_-6px_12px_rgba(255,255,255,0.04)] transition focus-within:shadow-[inset_6px_6px_12px_rgba(0,0,0,0.6),inset_-6px_-6px_12px_rgba(255,255,255,0.05),0_0_18px_-4px_var(--color-primary)]">
-                <User className="h-5 w-5 shrink-0 text-primary" />
+                <Mail className="h-5 w-5 shrink-0 text-primary" />
                 <input
-                  id="user"
-                  type="text"
-                  value={user}
-                  onChange={(e) => {
-                    setUser(e.target.value);
-                    if (error) setError(false);
-                  }}
-                  placeholder="Digite o usuário"
-                  autoComplete="username"
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="seu@email.com"
+                  autoComplete="email"
                   className="w-full border-0 bg-transparent py-3 text-sm text-foreground outline-none placeholder:text-muted-foreground"
                 />
               </div>
@@ -95,12 +156,9 @@ function Index() {
                   id="password"
                   type={show ? "text" : "password"}
                   value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    if (error) setError(false);
-                  }}
-                  placeholder="Digite a senha"
-                  autoComplete="current-password"
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Mínimo de 6 caracteres"
+                  autoComplete={modo === "criar" ? "new-password" : "current-password"}
                   className="w-full border-0 bg-transparent py-3 text-sm text-foreground outline-none placeholder:text-muted-foreground"
                 />
                 <button
@@ -114,24 +172,23 @@ function Index() {
               </div>
             </div>
 
-            {error && (
-              <p className="text-center text-sm font-medium text-destructive">
-                Usuário ou senha incorretos. Tente novamente.
-              </p>
-            )}
-
             <button
               type="submit"
-              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-primary to-success px-5 py-4 text-sm font-semibold text-primary-foreground shadow-[6px_6px_16px_rgba(0,0,0,0.5),-4px_-4px_12px_rgba(255,255,255,0.05),0_0_28px_-6px_var(--color-primary)] transition hover:shadow-[6px_6px_18px_rgba(0,0,0,0.55),0_0_36px_-4px_var(--color-primary)] active:scale-[0.99]"
+              disabled={busy}
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-primary to-success px-5 py-4 text-sm font-semibold text-primary-foreground shadow-[6px_6px_16px_rgba(0,0,0,0.5),-4px_-4px_12px_rgba(255,255,255,0.05),0_0_28px_-6px_var(--color-primary)] transition hover:shadow-[6px_6px_18px_rgba(0,0,0,0.55),0_0_36px_-4px_var(--color-primary)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Acessar Estoque
-              <ArrowRight className="h-4 w-4" />
+              {busy ? "Aguarde…" : modo === "entrar" ? "Acessar Estoque" : "Criar conta"}
+              {modo === "entrar" ? (
+                <ArrowRight className="h-4 w-4" />
+              ) : (
+                <UserPlus className="h-4 w-4" />
+              )}
             </button>
           </div>
         </form>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          Acesso protegido por usuário e senha
+          Acesso protegido por e-mail e senha • dados salvos na nuvem
         </p>
         <p className="mt-2 text-center text-xs text-muted-foreground">
           By Francisco Chagas — todos os direitos reservados 2026

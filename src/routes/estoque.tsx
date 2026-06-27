@@ -1,132 +1,356 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
+import {
+  CATEGORIAS_EXEMPLO,
+  PRODUTOS_EXEMPLO,
+  type Category,
+  type Movement,
+  type Product,
+} from "@/lib/estoque";
+import { exportarCSV, exportarPDF } from "@/lib/export-estoque";
+import { ConfirmModal } from "@/components/estoque/ConfirmModal";
+import { ProductFormModal, type ProductFormData } from "@/components/estoque/ProductFormModal";
+import { CategoryModal } from "@/components/estoque/CategoryModal";
+import { HistoryModal } from "@/components/estoque/HistoryModal";
 
 export const Route = createFileRoute("/estoque")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Estoque Mínimo — Controle de Inventário" },
       {
         name: "description",
         content:
-          "Busque por código, fabricante, tipo ou produto e verifique se há necessidade de reposição com base no estoque mínimo.",
-      },
-      { property: "og:title", content: "Estoque Mínimo — Controle de Inventário" },
-      {
-        property: "og:description",
-        content:
-          "Busque por código, fabricante, tipo ou produto e verifique se há necessidade de reposição com base no estoque mínimo.",
+          "Gerencie produtos, categorias e o histórico de movimentações com dados salvos na nuvem.",
       },
     ],
   }),
   component: Estoque,
 });
 
-type Produto = {
-  codigo: string;
-  fabricante: string;
-  tipo: string;
-  produto: string;
-  quantidade: number;
-  minimo: number;
+type Confirmacao = {
+  open: boolean;
+  title: string;
+  description?: string;
+  confirmLabel?: string;
+  danger?: boolean;
+  onConfirm: () => void;
 };
 
-const MINIMO_PADRAO = 500;
-
-const PRODUTOS: Produto[] = [
-  { codigo: "6163", fabricante: "DELPHI", tipo: "Fabricante", produto: "Injeção/ignição", quantidade: 100, minimo: MINIMO_PADRAO },
-  { codigo: "4843", fabricante: "ELGIN S/A", tipo: "Fabricante", produto: "Pilhas", quantidade: 200, minimo: MINIMO_PADRAO },
-  { codigo: "115", fabricante: "EQUIPAGE/EQMAX", tipo: "Fabricante", produto: "Racks de teto", quantidade: 300, minimo: MINIMO_PADRAO },
-  { codigo: "2370", fabricante: "FILTROS BRASIL", tipo: "Fabricante", produto: "Filtros cabine", quantidade: 400, minimo: MINIMO_PADRAO },
-  { codigo: "6405", fabricante: "Flash Cover Capota Marítima", tipo: "Fabricante", produto: "Capota Marítima", quantidade: 500, minimo: MINIMO_PADRAO },
-  { codigo: "3115", fabricante: "GRID CALOTAS", tipo: "Fabricante", produto: "Calotas", quantidade: 600, minimo: MINIMO_PADRAO },
-  { codigo: "2561", fabricante: "H BUSTER", tipo: "Fabricante", produto: "Mídia/tela", quantidade: 700, minimo: MINIMO_PADRAO },
-  { codigo: "355", fabricante: "HENKEL LTDA", tipo: "Fabricante", produto: "Cola/adesivos", quantidade: 800, minimo: MINIMO_PADRAO },
-  { codigo: "8047", fabricante: "M3 capas", tipo: "Fabricante", produto: "Capas de volante", quantidade: 900, minimo: MINIMO_PADRAO },
-  { codigo: "1497", fabricante: "Magneti Marelli", tipo: "Fabricante", produto: "Bobinas/vela", quantidade: 1000, minimo: MINIMO_PADRAO },
-  { codigo: "3102", fabricante: "MULTILASER", tipo: "Fabricante", produto: "Multimídia", quantidade: 2000, minimo: MINIMO_PADRAO },
-  { codigo: "953", fabricante: "NP ADESIVOS", tipo: "Fabricante", produto: "Adesivos", quantidade: 3000, minimo: MINIMO_PADRAO },
-  { codigo: "2389", fabricante: "PETROBRAS (BR)", tipo: "Fabricante", produto: "Lubrificantes", quantidade: 4000, minimo: MINIMO_PADRAO },
-  { codigo: "4768", fabricante: "PHILCO", tipo: "Fabricante", produto: "Pilhas/Aparelhos eletrônicos", quantidade: 5000, minimo: MINIMO_PADRAO },
-  { codigo: "56", fabricante: "PIONEER", tipo: "Fabricante", produto: "Som automotivo", quantidade: 6000, minimo: MINIMO_PADRAO },
-  { codigo: "1751", fabricante: "ROADSTAR", tipo: "Fabricante", produto: "Display/Telas som", quantidade: 7000, minimo: MINIMO_PADRAO },
-  { codigo: "7436", fabricante: "SAINT-GOBAIN DISTRI BRASIL LTDA", tipo: "Fabricante", produto: "Caixa de som/Fones", quantidade: 8000, minimo: MINIMO_PADRAO },
-  { codigo: "6127", fabricante: "SUPORTE REI", tipo: "Fabricante", produto: "Suporte/Linha pesada", quantidade: 9000, minimo: MINIMO_PADRAO },
-  { codigo: "4000", fabricante: "TEC FIL", tipo: "Fabricante", produto: "Filtros de ar", quantidade: 1000, minimo: MINIMO_PADRAO },
-  { codigo: "362", fabricante: "WEGA MOTORS", tipo: "Fabricante", produto: "Filtros/Palhetas", quantidade: 2000, minimo: MINIMO_PADRAO },
-];
-
-const CARDS: { titulo: string; icon: string; termo: string }[] = [
-  { titulo: "Filtros de ar", icon: "🌀", termo: "filtro" },
-  { titulo: "Mídia Player", icon: "📺", termo: "mídia" },
-  { titulo: "Calotas", icon: "🛞", termo: "calota" },
-  { titulo: "Palhetas", icon: "🧹", termo: "palheta" },
-];
-
 function Estoque() {
+  const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
+
+  const [carregando, setCarregando] = useState(true);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [movements, setMovements] = useState<Movement[]>([]);
+
   const [busca, setBusca] = useState("");
   const [filtroCard, setFiltroCard] = useState<string | null>(null);
   const [filtroRepor, setFiltroRepor] = useState<"repor" | "ok" | null>(null);
   const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
-  // Quantidades atuais (com ajustes manuais aplicados)
-  const [quantidades, setQuantidades] = useState<Record<string, number>>(
-    () => Object.fromEntries(PRODUTOS.map((p) => [p.codigo, p.quantidade])),
-  );
-  // Valores digitados em cada campo "completar estoque"
   const [reposicoes, setReposicoes] = useState<Record<string, string>>({});
 
-  const ajustarEstoque = (codigo: string, minimo: number, sinal: 1 | -1) => {
-    const valor = Number(reposicoes[codigo]);
-    if (!Number.isFinite(valor) || valor <= 0) return;
-    setQuantidades((prev) => {
-      const atual = prev[codigo] ?? 0;
-      // Não permite passar do mínimo padronizado nem ficar abaixo de 0
-      const novo = Math.max(0, Math.min(minimo, atual + sinal * valor));
-      return { ...prev, [codigo]: novo };
-    });
-    setReposicoes((prev) => ({ ...prev, [codigo]: "" }));
+  const [productModal, setProductModal] = useState<{ open: boolean; product: Product | null }>({
+    open: false,
+    product: null,
+  });
+  const [categoryOpen, setCategoryOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [confirm, setConfirm] = useState<Confirmacao>({
+    open: false,
+    title: "",
+    onConfirm: () => {},
+  });
+
+  // Proteção de rota
+  useEffect(() => {
+    if (!authLoading && !user) navigate({ to: "/" });
+  }, [authLoading, user, navigate]);
+
+  const carregarDados = useCallback(async () => {
+    if (!user) return;
+    setCarregando(true);
+    const [prod, cat, mov] = await Promise.all([
+      supabase.from("products").select("*").order("produto", { ascending: true }),
+      supabase.from("categories").select("*").order("nome", { ascending: true }),
+      supabase
+        .from("stock_movements")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(150),
+    ]);
+    if (prod.error || cat.error || mov.error) {
+      toast.error("Erro ao carregar os dados da nuvem.");
+    }
+    setProducts((prod.data as Product[]) ?? []);
+    setCategories((cat.data as Category[]) ?? []);
+    setMovements((mov.data as Movement[]) ?? []);
+    setCarregando(false);
+  }, [user]);
+
+  useEffect(() => {
+    if (user) carregarDados();
+  }, [user, carregarDados]);
+
+  // ---- Operações de estoque ----
+  const aplicarQuantidade = useCallback(
+    async (product: Product, novaBruta: number, acao: string) => {
+      if (!user) return;
+      const nova = Math.max(0, Math.floor(novaBruta));
+      const anterior = product.quantidade;
+      const { error } = await supabase
+        .from("products")
+        .update({ quantidade: nova })
+        .eq("id", product.id);
+      if (error) {
+        toast.error("Não foi possível atualizar o estoque.");
+        return;
+      }
+      setProducts((prev) =>
+        prev.map((p) => (p.id === product.id ? { ...p, quantidade: nova } : p)),
+      );
+      const movInsert = {
+        user_id: user.id,
+        product_id: product.id,
+        produto_nome: product.produto,
+        codigo: product.codigo,
+        acao,
+        delta: nova - anterior,
+        quantidade_anterior: anterior,
+        quantidade_nova: nova,
+      };
+      const { data } = await supabase
+        .from("stock_movements")
+        .insert(movInsert)
+        .select()
+        .single();
+      if (data) setMovements((prev) => [data as Movement, ...prev]);
+    },
+    [user],
+  );
+
+  const ajustarEstoque = (product: Product, sinal: 1 | -1) => {
+    const valor = Number(reposicoes[product.id]);
+    if (!Number.isFinite(valor) || valor <= 0) {
+      toast.error("Informe uma quantidade válida.");
+      return;
+    }
+    const nova = Math.max(0, Math.min(product.minimo, product.quantidade + sinal * valor));
+    aplicarQuantidade(product, nova, sinal > 0 ? "entrada" : "saida");
+    setReposicoes((prev) => ({ ...prev, [product.id]: "" }));
   };
 
-  // Completa um único produto até a quantidade mínima padronizada cadastrada
-  const completarMinimo = (codigo: string, minimo: number) => {
-    setQuantidades((prev) => ({ ...prev, [codigo]: minimo }));
-    setReposicoes((prev) => ({ ...prev, [codigo]: "" }));
-  };
+  const completarMinimo = (product: Product) =>
+    aplicarQuantidade(product, product.minimo, "completar");
 
-  // Completa TODOS os produtos atualmente listados até o mínimo padronizado
-  const completarTodosMinimo = () => {
-    setQuantidades((prev) => {
-      const novo = { ...prev };
-      for (const p of resultados) novo[p.codigo] = p.minimo;
-      return novo;
-    });
+  const completarTodos = async () => {
+    const alvos = resultados.filter((p) => p.quantidade < p.minimo);
+    if (alvos.length === 0) {
+      toast.info("Nenhum item precisa de reposição na lista atual.");
+      return;
+    }
+    for (const p of alvos) await aplicarQuantidade(p, p.minimo, "completar");
+    toast.success(`${alvos.length} item(ns) completados até o mínimo.`);
   };
 
   const zerarEstoque = () => {
-    if (
-      !window.confirm(
-        "Tem certeza que deseja zerar o estoque de TODOS os produtos cadastrados? Esta ação não pode ser desfeita.",
-      )
-    )
-      return;
-    setQuantidades(Object.fromEntries(PRODUTOS.map((p) => [p.codigo, 0])));
+    setConfirm({
+      open: true,
+      title: "Zerar todo o estoque?",
+      description:
+        "A quantidade de TODOS os produtos será definida como 0. Cada alteração ficará registrada no histórico. Esta ação não pode ser desfeita.",
+      confirmLabel: "Zerar tudo",
+      danger: true,
+      onConfirm: async () => {
+        setConfirm((c) => ({ ...c, open: false }));
+        for (const p of products) {
+          if (p.quantidade !== 0) await aplicarQuantidade(p, 0, "zerar");
+        }
+        toast.success("Estoque zerado.");
+      },
+    });
   };
 
+  // ---- CRUD de produtos ----
+  const salvarProduto = async (form: ProductFormData) => {
+    if (!user) return;
+    const editando = productModal.product;
+    if (editando) {
+      const { error } = await supabase.from("products").update(form).eq("id", editando.id);
+      if (error) {
+        toast.error("Erro ao salvar o produto.");
+        return;
+      }
+      setProducts((prev) =>
+        prev.map((p) => (p.id === editando.id ? { ...p, ...form } : p)),
+      );
+      if (form.quantidade !== editando.quantidade) {
+        const mov = {
+          user_id: user.id,
+          product_id: editando.id,
+          produto_nome: form.produto,
+          codigo: form.codigo,
+          acao: "ajuste",
+          delta: form.quantidade - editando.quantidade,
+          quantidade_anterior: editando.quantidade,
+          quantidade_nova: form.quantidade,
+        };
+        const { data } = await supabase.from("stock_movements").insert(mov).select().single();
+        if (data) setMovements((prev) => [data as Movement, ...prev]);
+      }
+      toast.success("Produto atualizado.");
+    } else {
+      const { data, error } = await supabase
+        .from("products")
+        .insert({ ...form, user_id: user.id })
+        .select()
+        .single();
+      if (error || !data) {
+        toast.error("Erro ao criar o produto.");
+        return;
+      }
+      const novo = data as Product;
+      setProducts((prev) =>
+        [...prev, novo].sort((a, b) => a.produto.localeCompare(b.produto)),
+      );
+      const mov = {
+        user_id: user.id,
+        product_id: novo.id,
+        produto_nome: novo.produto,
+        codigo: novo.codigo,
+        acao: "criar",
+        delta: novo.quantidade,
+        quantidade_anterior: 0,
+        quantidade_nova: novo.quantidade,
+      };
+      const { data: movData } = await supabase
+        .from("stock_movements")
+        .insert(mov)
+        .select()
+        .single();
+      if (movData) setMovements((prev) => [movData as Movement, ...prev]);
+      toast.success("Produto criado.");
+    }
+    setProductModal({ open: false, product: null });
+  };
+
+  const excluirProduto = (product: Product) => {
+    setConfirm({
+      open: true,
+      title: `Excluir "${product.produto}"?`,
+      description: "O produto será removido permanentemente do estoque.",
+      confirmLabel: "Excluir",
+      danger: true,
+      onConfirm: async () => {
+        setConfirm((c) => ({ ...c, open: false }));
+        const { error } = await supabase.from("products").delete().eq("id", product.id);
+        if (error) {
+          toast.error("Erro ao excluir o produto.");
+          return;
+        }
+        setProducts((prev) => prev.filter((p) => p.id !== product.id));
+        if (user) {
+          const mov = {
+            user_id: user.id,
+            product_id: null,
+            produto_nome: product.produto,
+            codigo: product.codigo,
+            acao: "excluir",
+            delta: -product.quantidade,
+            quantidade_anterior: product.quantidade,
+            quantidade_nova: 0,
+          };
+          const { data } = await supabase.from("stock_movements").insert(mov).select().single();
+          if (data) setMovements((prev) => [data as Movement, ...prev]);
+        }
+        toast.success("Produto excluído.");
+      },
+    });
+  };
+
+  // ---- Categorias ----
+  const adicionarCategoria = async (nome: string, icon: string, termo: string) => {
+    if (!user) return;
+    const { data, error } = await supabase
+      .from("categories")
+      .insert({ user_id: user.id, nome, icon, termo })
+      .select()
+      .single();
+    if (error) {
+      toast.error(
+        error.code === "23505" ? "Já existe uma categoria com esse nome." : "Erro ao criar categoria.",
+      );
+      return;
+    }
+    setCategories((prev) => [...prev, data as Category].sort((a, b) => a.nome.localeCompare(b.nome)));
+    toast.success("Categoria adicionada.");
+  };
+
+  const excluirCategoria = (cat: Category) => {
+    setConfirm({
+      open: true,
+      title: `Excluir categoria "${cat.nome}"?`,
+      description: "Os produtos não são apagados — apenas o filtro de categoria é removido.",
+      confirmLabel: "Excluir",
+      danger: true,
+      onConfirm: async () => {
+        setConfirm((c) => ({ ...c, open: false }));
+        const { error } = await supabase.from("categories").delete().eq("id", cat.id);
+        if (error) {
+          toast.error("Erro ao excluir categoria.");
+          return;
+        }
+        setCategories((prev) => prev.filter((c) => c.id !== cat.id));
+        if (filtroCard === cat.termo) setFiltroCard(null);
+        toast.success("Categoria excluída.");
+      },
+    });
+  };
+
+  // ---- Dados de exemplo ----
+  const carregarExemplos = async () => {
+    if (!user) return;
+    const { error: e1 } = await supabase
+      .from("products")
+      .insert(PRODUTOS_EXEMPLO.map((p) => ({ ...p, user_id: user.id })));
+    await supabase
+      .from("categories")
+      .insert(CATEGORIAS_EXEMPLO.map((c) => ({ ...c, user_id: user.id })));
+    if (e1) {
+      toast.error("Erro ao carregar dados de exemplo.");
+      return;
+    }
+    toast.success("Dados de exemplo carregados.");
+    carregarDados();
+  };
+
+  const sair = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/" });
+  };
+
+  // ---- Derivados ----
   const sugestoes = useMemo(() => {
     const termo = busca.trim().toLowerCase();
     if (termo === "") return [];
     const valores = new Set<string>();
-    for (const p of PRODUTOS) {
+    for (const p of products) {
       for (const campo of [p.produto, p.fabricante, p.tipo, p.codigo]) {
         if (campo.toLowerCase().includes(termo)) valores.add(campo);
       }
     }
     return Array.from(valores).slice(0, 6);
-  }, [busca]);
+  }, [busca, products]);
 
   const resultados = useMemo(() => {
     const termo = busca.trim().toLowerCase();
     const card = filtroCard?.toLowerCase() ?? null;
-    return PRODUTOS.filter((p) => {
+    return products.filter((p) => {
       const alvo = `${p.produto} ${p.tipo} ${p.fabricante}`.toLowerCase();
       const matchCard = card ? alvo.includes(card) : true;
       const matchBusca =
@@ -135,26 +359,32 @@ function Estoque() {
         p.fabricante.toLowerCase().includes(termo) ||
         p.tipo.toLowerCase().includes(termo) ||
         p.produto.toLowerCase().includes(termo);
-      const atual = quantidades[p.codigo] ?? p.quantidade;
-      const precisaRepor = atual < p.minimo;
+      const precisaRepor = p.quantidade < p.minimo;
       const matchRepor =
-        filtroRepor === null
-          ? true
-          : filtroRepor === "repor"
-            ? precisaRepor
-            : !precisaRepor;
+        filtroRepor === null ? true : filtroRepor === "repor" ? precisaRepor : !precisaRepor;
       return matchCard && matchBusca && matchRepor;
     });
-  }, [busca, filtroCard, filtroRepor, quantidades]);
+  }, [busca, filtroCard, filtroRepor, products]);
 
-  const totalProdutos = PRODUTOS.length;
-  const totalItens = Object.values(quantidades).reduce((soma, q) => soma + q, 0);
+  const totalProdutos = products.length;
+  const totalItens = products.reduce((soma, p) => soma + p.quantidade, 0);
+  const itensAbaixo = products.filter((p) => p.quantidade < p.minimo).length;
 
+  if (authLoading || (!user && carregando)) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background text-sm text-muted-foreground">
+        Carregando…
+      </div>
+    );
+  }
+
+  const btnAcao =
+    "rounded-xl border px-5 py-3 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5";
 
   return (
     <div className="min-h-screen bg-background px-4 py-10 sm:py-16">
       <div className="mx-auto w-full max-w-4xl">
-        <header className="mb-10 text-center">
+        <header className="mb-8 text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-card px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-primary shadow-[0_0_18px_-6px_var(--color-primary)]">
             <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />
             Controle de Inventário
@@ -162,14 +392,90 @@ function Estoque() {
           <p className="mt-2 text-xs font-medium tracking-wide text-muted-foreground">
             By Francisco Chagas
           </p>
-          <h1 className="mt-5 font-display text-4xl font-bold tracking-tight sm:text-5xl">
+          <h1 className="mt-4 font-display text-4xl font-bold tracking-tight sm:text-5xl">
             Gestão de produtos
           </h1>
           <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
-            Busque por código, fabricante, tipo ou produto e veja quais itens precisam de
-            reposição.
+            Dados salvos na nuvem. Gerencie produtos, categorias e o histórico de movimentações.
           </p>
         </header>
+
+        {/* Alerta / contador */}
+        <div
+          className={`mb-6 flex items-center justify-center gap-3 rounded-xl border px-5 py-3 text-sm font-semibold ${
+            itensAbaixo > 0
+              ? "border-red-700/60 bg-red-950/30 text-red-200 shadow-[0_0_24px_-6px_rgba(153,27,27,0.85)]"
+              : "border-primary/40 bg-primary/10 text-foreground shadow-[0_0_18px_-6px_var(--color-primary)]"
+          }`}
+        >
+          {itensAbaixo > 0 ? (
+            <>🔴 {itensAbaixo} {itensAbaixo === 1 ? "item está" : "itens estão"} abaixo do mínimo</>
+          ) : (
+            <>✅ Todos os itens estão acima do estoque mínimo</>
+          )}
+        </div>
+
+        {/* Barra de ferramentas */}
+        <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <button
+            type="button"
+            onClick={() => setProductModal({ open: true, product: null })}
+            className="rounded-xl border border-primary bg-primary/15 px-3 py-3 text-sm font-semibold text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] transition hover:bg-primary/25"
+          >
+            ➕ Novo produto
+          </button>
+          <button
+            type="button"
+            onClick={() => setCategoryOpen(true)}
+            className="rounded-xl border border-primary/40 bg-card px-3 py-3 text-sm font-semibold text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] transition hover:bg-primary/10"
+          >
+            🗂️ Categorias
+          </button>
+          <button
+            type="button"
+            onClick={() => setHistoryOpen(true)}
+            className="rounded-xl border border-primary/40 bg-card px-3 py-3 text-sm font-semibold text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] transition hover:bg-primary/10"
+          >
+            🕘 Histórico
+          </button>
+          <button
+            type="button"
+            onClick={sair}
+            className="rounded-xl border border-border bg-card px-3 py-3 text-sm font-semibold text-foreground transition hover:bg-secondary"
+          >
+            🚪 Sair
+          </button>
+        </div>
+
+        {/* Exportação */}
+        <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <button
+            type="button"
+            onClick={() => exportarCSV(resultados, filtroRepor === "repor")}
+            className="rounded-xl border border-primary/40 bg-card px-3 py-2.5 text-xs font-semibold text-foreground transition hover:bg-primary/10"
+          >
+            📊 Exportar Excel (CSV)
+          </button>
+          <button
+            type="button"
+            onClick={() => exportarPDF(resultados, filtroRepor === "repor")}
+            className="rounded-xl border border-primary/40 bg-card px-3 py-2.5 text-xs font-semibold text-foreground transition hover:bg-primary/10"
+          >
+            📄 Exportar PDF
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              exportarPDF(
+                products.filter((p) => p.quantidade < p.minimo),
+                true,
+              )
+            }
+            className="col-span-2 rounded-xl border border-red-900/50 bg-card px-3 py-2.5 text-xs font-semibold text-red-200 transition hover:bg-red-950/30"
+          >
+            📄 PDF dos itens a repor
+          </button>
+        </div>
 
         {/* Campo de busca */}
         <div className="mb-8">
@@ -207,10 +513,8 @@ function Estoque() {
                   ✕
                 </button>
               )}
-
-              {/* Sugestões de autocompletar */}
               {mostrarSugestoes && sugestoes.length > 0 && (
-                <ul className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-primary/40 bg-card shadow-[0_0_20px_-4px_var(--color-primary)] animate-fade-in">
+                <ul className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-primary/40 bg-card shadow-[0_0_20px_-4px_var(--color-primary)]">
                   {sugestoes.map((s) => (
                     <li key={s}>
                       <button
@@ -237,13 +541,9 @@ function Estoque() {
               🔎 Buscar
             </button>
           </form>
-          <p className="mt-2 px-1 text-xs text-muted-foreground">
-            Filtra por: Código • Fabricante • Tipo • Produto
-          </p>
         </div>
 
-
-        {/* Card resumo do estoque */}
+        {/* Resumo */}
         <div className="mb-6 flex flex-wrap items-center justify-center gap-3 rounded-xl border border-primary/30 bg-card px-5 py-4 shadow-[0_0_18px_-6px_var(--color-primary)] sm:justify-between">
           <div className="flex items-center gap-3">
             <span className="text-2xl">📦</span>
@@ -256,9 +556,7 @@ function Estoque() {
           </div>
           <div className="flex items-center gap-6">
             <div className="text-center">
-              <div className="font-display text-2xl font-bold text-primary">
-                {totalProdutos}
-              </div>
+              <div className="font-display text-2xl font-bold text-primary">{totalProdutos}</div>
               <div className="text-xs text-muted-foreground">Produtos</div>
             </div>
             <div className="h-8 w-px bg-border" />
@@ -271,41 +569,43 @@ function Estoque() {
           </div>
         </div>
 
-        {/* 4 cards principais por produto */}
-        <section className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {CARDS.map((c) => {
-            const ativo = filtroCard === c.termo;
-            const total = PRODUTOS.filter((p) =>
-              `${p.produto} ${p.tipo} ${p.fabricante}`.toLowerCase().includes(c.termo),
-            ).length;
-            return (
-              <button
-                key={c.titulo}
-                type="button"
-                onClick={() => setFiltroCard(ativo ? null : c.termo)}
-                className={`group rounded-xl border p-4 text-left transition-all duration-300 hover:-translate-y-1 ${
-                  ativo
-                    ? "border-primary bg-primary/10 shadow-[0_0_24px_-2px_var(--color-primary),inset_0_0_0_1px_var(--color-primary)]"
-                    : "border-primary/30 bg-card shadow-[0_0_18px_-6px_var(--color-primary)] hover:border-primary/60 hover:bg-primary/5 hover:shadow-[0_0_28px_-4px_var(--color-primary)]"
-                }`}
-              >
-                <div className="text-2xl">{c.icon}</div>
-                <div className="mt-2 font-display text-sm font-semibold">{c.titulo}</div>
-                <div className="text-xs text-muted-foreground">{total} produto(s)</div>
-              </button>
-            );
-          })}
-        </section>
+        {/* Categorias (cards de filtro) */}
+        {categories.length > 0 && (
+          <section className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {categories.map((c) => {
+              const ativo = filtroCard === c.termo;
+              const total = products.filter((p) =>
+                `${p.produto} ${p.tipo} ${p.fabricante}`.toLowerCase().includes(c.termo),
+              ).length;
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => setFiltroCard(ativo ? null : c.termo)}
+                  className={`group rounded-xl border p-4 text-left transition-all duration-300 hover:-translate-y-1 ${
+                    ativo
+                      ? "border-primary bg-primary/10 shadow-[0_0_24px_-2px_var(--color-primary),inset_0_0_0_1px_var(--color-primary)]"
+                      : "border-primary/30 bg-card shadow-[0_0_18px_-6px_var(--color-primary)] hover:border-primary/60 hover:bg-primary/5"
+                  }`}
+                >
+                  <div className="text-2xl">{c.icon}</div>
+                  <div className="mt-2 font-display text-sm font-semibold">{c.nome}</div>
+                  <div className="text-xs text-muted-foreground">{total} produto(s)</div>
+                </button>
+              );
+            })}
+          </section>
+        )}
 
-        {/* Botões de ação / filtros */}
+        {/* Filtros / ações em lote */}
         <div className="mb-8 grid grid-cols-1 gap-3 sm:flex sm:flex-wrap sm:justify-end">
           <button
             type="button"
             onClick={() => setFiltroRepor(filtroRepor === "repor" ? null : "repor")}
-            className={`rounded-xl border px-6 py-3 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 ${
+            className={`${btnAcao} ${
               filtroRepor === "repor"
                 ? "border-red-600 bg-red-950/40 text-red-200 shadow-[0_0_28px_-2px_rgba(153,27,27,0.9)]"
-                : "border-red-900/50 bg-card text-foreground shadow-[0_0_18px_-6px_rgba(153,27,27,0.8)] hover:border-red-700 hover:bg-red-950/20 hover:shadow-[0_0_28px_-4px_rgba(153,27,27,0.9)]"
+                : "border-red-900/50 bg-card text-foreground shadow-[0_0_18px_-6px_rgba(153,27,27,0.8)] hover:bg-red-950/20"
             }`}
           >
             🔴 Precisa repor
@@ -313,10 +613,10 @@ function Estoque() {
           <button
             type="button"
             onClick={() => setFiltroRepor(filtroRepor === "ok" ? null : "ok")}
-            className={`rounded-xl border px-6 py-3 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 ${
+            className={`${btnAcao} ${
               filtroRepor === "ok"
                 ? "border-primary bg-primary/15 text-foreground shadow-[0_0_28px_-2px_var(--color-primary)]"
-                : "border-primary/40 bg-card text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] hover:border-primary/70 hover:bg-primary/10 hover:shadow-[0_0_28px_-4px_var(--color-primary)]"
+                : "border-primary/40 bg-card text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] hover:bg-primary/10"
             }`}
           >
             ✅ Não precisa repor
@@ -328,65 +628,87 @@ function Estoque() {
               setFiltroRepor(null);
               setBusca("");
             }}
-            className="rounded-xl border border-primary/40 bg-card px-6 py-3 text-sm font-semibold text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/70 hover:bg-primary/10 hover:shadow-[0_0_28px_-4px_var(--color-primary)]"
+            className={`${btnAcao} border-primary/40 bg-card text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] hover:bg-primary/10`}
           >
             📦 Carregar tudo
           </button>
           <button
             type="button"
-            onClick={completarTodosMinimo}
-            className="rounded-xl border border-primary bg-primary/15 px-6 py-3 text-sm font-semibold text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] transition-all duration-300 hover:-translate-y-0.5 hover:border-primary hover:bg-primary/25 hover:shadow-[0_0_28px_-2px_var(--color-primary)]"
+            onClick={completarTodos}
+            className={`${btnAcao} border-primary bg-primary/15 text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] hover:bg-primary/25`}
           >
             ✅ Completar estoque (todos)
           </button>
           <button
             type="button"
             onClick={zerarEstoque}
-            className="rounded-xl border border-red-600 bg-red-950/40 px-6 py-3 text-sm font-semibold text-red-200 shadow-[0_0_18px_-6px_rgba(153,27,27,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:border-red-500 hover:bg-red-900/50 hover:shadow-[0_0_28px_-2px_rgba(153,27,27,0.95)]"
+            className={`${btnAcao} border-red-600 bg-red-950/40 text-red-200 shadow-[0_0_18px_-6px_rgba(153,27,27,0.9)] hover:bg-red-900/50`}
           >
             🗑️ Zerar estoque
           </button>
         </div>
 
-
-        {/* Resultados */}
+        {/* Lista */}
         <section className="rounded-2xl border border-border bg-card p-4 shadow-lg shadow-black/20 sm:p-6">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-display text-lg font-semibold">
               {filtroCard
-                ? `Filtro: ${CARDS.find((c) => c.termo === filtroCard)?.titulo}`
+                ? `Filtro: ${categories.find((c) => c.termo === filtroCard)?.nome ?? filtroCard}`
                 : "Todos os produtos"}
             </h2>
-            <span className="text-xs text-muted-foreground">
-              {resultados.length} resultado(s)
-            </span>
+            <span className="text-xs text-muted-foreground">{resultados.length} resultado(s)</span>
           </div>
 
-          {resultados.length === 0 ? (
+          {carregando ? (
+            <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+              Carregando produtos…
+            </div>
+          ) : products.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-border p-8 text-center">
+              <p className="text-sm text-muted-foreground">
+                Você ainda não tem produtos cadastrados.
+              </p>
+              <div className="mt-4 flex flex-wrap justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setProductModal({ open: true, product: null })}
+                  className="rounded-xl border border-primary bg-primary/15 px-5 py-2.5 text-sm font-semibold text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] transition hover:bg-primary/25"
+                >
+                  ➕ Criar primeiro produto
+                </button>
+                <button
+                  type="button"
+                  onClick={carregarExemplos}
+                  className="rounded-xl border border-primary/40 bg-card px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-primary/10"
+                >
+                  📥 Carregar dados de exemplo
+                </button>
+              </div>
+            </div>
+          ) : resultados.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
               Nenhum produto encontrado para a busca informada.
             </div>
           ) : (
             <ul className="grid gap-3">
               {resultados.map((p) => {
-                const atual = quantidades[p.codigo] ?? p.quantidade;
+                const atual = p.quantidade;
                 const baixo = atual < p.minimo;
                 const acima = atual > p.minimo;
                 return (
                   <li
-                    key={p.codigo}
+                    key={p.id}
                     className={`rounded-xl border bg-background p-4 transition-all duration-300 ${
                       baixo
-                        ? "border-red-700/60 shadow-[0_0_24px_-2px_rgba(153,27,27,0.85)] hover:border-red-600 hover:shadow-[0_0_32px_0px_rgba(153,27,27,0.95)]"
-                        : "border-primary/20 hover:border-primary/50 hover:shadow-[0_0_22px_-6px_var(--color-primary)]"
+                        ? "border-red-700/60 shadow-[0_0_24px_-2px_rgba(153,27,27,0.85)]"
+                        : "border-primary/20 hover:border-primary/50"
                     }`}
                   >
-
-                    <div className="flex items-start gap-4">
+                    <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="rounded-md bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground">
-                            {p.codigo}
+                            {p.codigo || "—"}
                           </span>
                           <h3 className="font-display text-sm font-semibold text-foreground">
                             {p.produto}
@@ -396,111 +718,89 @@ function Estoque() {
                           <strong className="text-foreground">Fabricante:</strong> {p.fabricante}{" "}
                           • <strong className="text-foreground">Tipo:</strong> {p.tipo}
                         </p>
-                        <div className="mt-3 flex items-center gap-3">
-                          <div className="h-2 w-32 overflow-hidden rounded-full bg-secondary">
-                            <div
-                              className={`h-full rounded-full ${
-                                baixo ? "bg-warning" : "bg-primary"
-                              }`}
-                              style={{
-                                width: `${Math.min(100, (atual / p.minimo) * 100)}%`,
-                              }}
-                            />
-                          </div>
-                          <span className="text-xs text-muted-foreground">
-                            {atual} / mín. {p.minimo} un.
-                          </span>
-                        </div>
-
-                        {/* Completar / ajustar estoque (sempre disponível) */}
-                        <div
-                          className={`mt-3 flex flex-wrap items-center gap-2 rounded-lg border p-2 ${
-                            baixo || acima
-                              ? "border-warning/30 bg-warning/5"
-                              : "border-primary/30 bg-primary/5"
-                          }`}
-                        >
-                          <span
-                            className={`text-xs font-medium ${
-                              baixo
-                                ? "text-warning-foreground"
-                                : acima
-                                  ? "text-warning-foreground"
-                                  : "text-foreground"
-                            }`}
-                          >
-                            {baixo
-                              ? `Faltam ${p.minimo - atual} un.`
-                              : acima
-                                ? `⚠️ Estoque ${Math.round((atual / p.minimo) * 100)}% (excedeu em ${atual - p.minimo} un.) — insira apenas o mínimo (${p.minimo} un.)`
-                                : "✅ Estoque completo (100%)"}
-                          </span>
-
-                          <input
-                            type="number"
-                            min={1}
-                            value={reposicoes[p.codigo] ?? ""}
-                            onChange={(e) =>
-                              setReposicoes((prev) => ({
-                                ...prev,
-                                [p.codigo]: e.target.value,
-                              }))
-                            }
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") ajustarEstoque(p.codigo, p.minimo, 1);
-                            }}
-                            placeholder="Qtd."
-                            className="h-8 w-24 rounded-md border border-input bg-background px-2 text-xs outline-none transition focus:border-primary focus:ring-1 focus:ring-ring/40"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => ajustarEstoque(p.codigo, p.minimo, 1)}
-                            disabled={atual >= p.minimo}
-                            className="h-8 rounded-md border border-primary/40 bg-primary/10 px-3 text-xs font-semibold text-foreground transition hover:bg-primary/20 disabled:cursor-not-allowed disabled:opacity-50"
-                          >
-                            ➕ {baixo ? "Completar estoque" : "Adicionar quantidade"}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => ajustarEstoque(p.codigo, p.minimo, -1)}
-                            disabled={atual <= 0}
-                            className="h-8 rounded-md border border-warning/40 bg-warning/10 px-3 text-xs font-semibold text-foreground transition hover:bg-warning/20 disabled:cursor-not-allowed disabled:opacity-50"
-                          >
-                            ➖ Diminuir quantidade
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => completarMinimo(p.codigo, p.minimo)}
-                            disabled={atual >= p.minimo}
-                            className="h-8 rounded-md border border-primary bg-primary/15 px-3 text-xs font-semibold text-foreground transition hover:bg-primary/25 disabled:cursor-not-allowed disabled:opacity-50"
-                          >
-                            ✅ Completar ao mínimo ({p.minimo})
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setReposicoes((prev) => ({
-                                ...prev,
-                                [p.codigo]: String(p.minimo),
-                              }))
-                            }
-                            className="h-8 rounded-md px-2 text-xs text-muted-foreground transition hover:text-foreground"
-                          >
-                            Preencher mínimo
-                          </button>
-                        </div>
-
-
                       </div>
-                      <span
-                        className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${
-                          baixo
-                            ? "bg-warning/15 text-warning-foreground"
-                            : "bg-primary/15 text-foreground"
-                        }`}
-                      >
-                        {baixo ? "📦 Repor" : "✅ OK"}
+                      <div className="flex shrink-0 gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => setProductModal({ open: true, product: p })}
+                          aria-label="Editar"
+                          className="rounded-lg border border-primary/40 px-2.5 py-1 text-xs font-semibold text-foreground transition hover:bg-primary/10"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => excluirProduto(p)}
+                          aria-label="Excluir"
+                          className="rounded-lg border border-red-900/50 px-2.5 py-1 text-xs font-semibold text-red-300 transition hover:bg-red-950/40"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 flex items-center gap-3">
+                      <div className="h-2 w-32 overflow-hidden rounded-full bg-secondary">
+                        <div
+                          className={`h-full rounded-full ${baixo ? "bg-warning" : "bg-primary"}`}
+                          style={{ width: `${Math.min(100, (atual / Math.max(1, p.minimo)) * 100)}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {atual} / mín. {p.minimo} un.
                       </span>
+                    </div>
+
+                    <div
+                      className={`mt-3 flex flex-wrap items-center gap-2 rounded-lg border p-2 ${
+                        baixo || acima
+                          ? "border-warning/30 bg-warning/5"
+                          : "border-primary/30 bg-primary/5"
+                      }`}
+                    >
+                      <span className="text-xs font-medium text-foreground">
+                        {baixo
+                          ? `Faltam ${p.minimo - atual} un.`
+                          : acima
+                            ? `⚠️ Excedeu em ${atual - p.minimo} un.`
+                            : "✅ Estoque completo (100%)"}
+                      </span>
+                      <input
+                        type="number"
+                        min={1}
+                        value={reposicoes[p.id] ?? ""}
+                        onChange={(e) =>
+                          setReposicoes((prev) => ({ ...prev, [p.id]: e.target.value }))
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") ajustarEstoque(p, 1);
+                        }}
+                        placeholder="Qtd."
+                        className="h-8 w-24 rounded-md border border-input bg-background px-2 text-xs outline-none transition focus:border-primary focus:ring-1 focus:ring-ring/40"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => ajustarEstoque(p, 1)}
+                        className="h-8 rounded-md border border-primary/40 bg-primary/10 px-3 text-xs font-semibold text-foreground transition hover:bg-primary/20"
+                      >
+                        ➕ Entrada
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => ajustarEstoque(p, -1)}
+                        disabled={atual <= 0}
+                        className="h-8 rounded-md border border-warning/40 bg-warning/10 px-3 text-xs font-semibold text-foreground transition hover:bg-warning/20 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        ➖ Saída
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => completarMinimo(p)}
+                        disabled={atual >= p.minimo}
+                        className="h-8 rounded-md border border-primary bg-primary/15 px-3 text-xs font-semibold text-foreground transition hover:bg-primary/25 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        ⤴️ Completar mínimo
+                      </button>
                     </div>
                   </li>
                 );
@@ -513,19 +813,47 @@ function Estoque() {
           <button
             type="button"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-primary/40 bg-card px-6 py-3 text-sm font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] transition hover:bg-primary/10 hover:shadow-[0_0_32px_-6px_var(--color-primary)] active:scale-[0.99] sm:w-auto"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-primary/40 bg-card px-6 py-3 text-sm font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] transition hover:bg-primary/10 sm:w-auto"
           >
             ↑ Voltar ao Início
           </button>
-          <Link
-            to="/"
-            className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-primary/40 bg-card px-6 py-3 text-sm font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] transition hover:bg-primary/10 hover:shadow-[0_0_32px_-6px_var(--color-primary)] active:scale-[0.99] sm:w-auto"
+          <button
+            type="button"
+            onClick={sair}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-primary/40 bg-card px-6 py-3 text-sm font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] transition hover:bg-primary/10 sm:w-auto"
           >
-            ← Voltar à tela de acesso
-          </Link>
+            🚪 Sair da conta
+          </button>
         </footer>
-
       </div>
+
+      <ProductFormModal
+        open={productModal.open}
+        product={productModal.product}
+        onSave={salvarProduto}
+        onClose={() => setProductModal({ open: false, product: null })}
+      />
+      <CategoryModal
+        open={categoryOpen}
+        categories={categories}
+        onAdd={adicionarCategoria}
+        onDelete={excluirCategoria}
+        onClose={() => setCategoryOpen(false)}
+      />
+      <HistoryModal
+        open={historyOpen}
+        movements={movements}
+        onClose={() => setHistoryOpen(false)}
+      />
+      <ConfirmModal
+        open={confirm.open}
+        title={confirm.title}
+        description={confirm.description}
+        confirmLabel={confirm.confirmLabel}
+        danger={confirm.danger}
+        onConfirm={confirm.onConfirm}
+        onCancel={() => setConfirm((c) => ({ ...c, open: false }))}
+      />
     </div>
   );
 }
