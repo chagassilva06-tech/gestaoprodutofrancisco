@@ -298,7 +298,7 @@ function Estoque() {
         </section>
 
         {/* Botões de ação / filtros */}
-        <div className="mb-8 flex flex-wrap justify-end gap-3">
+        <div className="mb-8 grid grid-cols-1 gap-3 sm:flex sm:flex-wrap sm:justify-end">
           <button
             type="button"
             onClick={() => setFiltroRepor(filtroRepor === "repor" ? null : "repor")}
