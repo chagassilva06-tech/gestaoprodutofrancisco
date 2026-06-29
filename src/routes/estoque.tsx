@@ -350,20 +350,27 @@ function Estoque() {
   const resultados = useMemo(() => {
     const termo = busca.trim().toLowerCase();
     const card = filtroCard?.toLowerCase() ?? null;
-    return products.filter((p) => {
-      const alvo = `${p.produto} ${p.tipo} ${p.fabricante}`.toLowerCase();
-      const matchCard = card ? alvo.includes(card) : true;
-      const matchBusca =
-        termo === "" ||
-        p.codigo.toLowerCase().includes(termo) ||
-        p.fabricante.toLowerCase().includes(termo) ||
-        p.tipo.toLowerCase().includes(termo) ||
-        p.produto.toLowerCase().includes(termo);
-      const precisaRepor = p.quantidade < p.minimo;
-      const matchRepor =
-        filtroRepor === null ? true : filtroRepor === "repor" ? precisaRepor : !precisaRepor;
-      return matchCard && matchBusca && matchRepor;
-    });
+    return products
+      .filter((p) => {
+        const alvo = `${p.produto} ${p.tipo} ${p.fabricante}`.toLowerCase();
+        const matchCard = card ? alvo.includes(card) : true;
+        const matchBusca =
+          termo === "" ||
+          p.codigo.toLowerCase().includes(termo) ||
+          p.fabricante.toLowerCase().includes(termo) ||
+          p.tipo.toLowerCase().includes(termo) ||
+          p.produto.toLowerCase().includes(termo);
+        const precisaRepor = p.quantidade < p.minimo;
+        const matchRepor =
+          filtroRepor === null ? true : filtroRepor === "repor" ? precisaRepor : !precisaRepor;
+        return matchCard && matchBusca && matchRepor;
+      })
+      .sort((a, b) =>
+        (a.codigo || "").localeCompare(b.codigo || "", undefined, {
+          numeric: true,
+          sensitivity: "base",
+        }),
+      );
   }, [busca, filtroCard, filtroRepor, products]);
 
   const totalProdutos = products.length;
