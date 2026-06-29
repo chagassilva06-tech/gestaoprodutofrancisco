@@ -153,6 +153,7 @@ function Estoque() {
     if (sinal > 0 && product.quantidade + valor > product.minimo) {
       const restante = Math.max(0, product.minimo - product.quantidade);
       toast.error("Quantidade acima do mínimo", {
+        closeButton: true,
         description:
           restante > 0
             ? `O estoque não pode ultrapassar o mínimo de ${product.minimo} un. Você pode adicionar no máximo ${restante} un.`
