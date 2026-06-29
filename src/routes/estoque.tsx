@@ -468,13 +468,6 @@ function Estoque() {
           >
             🕘 Histórico
           </button>
-          <button
-            type="button"
-            onClick={sair}
-            className="rounded-xl border border-border bg-card px-3 py-3 text-sm font-semibold text-foreground transition hover:bg-secondary"
-          >
-            🚪 Sair
-          </button>
         </div>
 
         {/* Exportação */}
