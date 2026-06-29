@@ -409,7 +409,7 @@ function Estoque() {
   }
 
   const btnAcao =
-    "rounded-xl border px-5 py-3 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5";
+    "flex items-center justify-center text-center rounded-xl border px-5 py-3 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5";
 
   return (
     <div className="min-h-screen bg-background px-4 py-10 sm:py-16">
@@ -606,7 +606,7 @@ function Estoque() {
                   key={c.id}
                   type="button"
                   onClick={() => setFiltroCard(ativo ? null : c.termo)}
-                  className={`group rounded-xl border p-4 text-left transition-all duration-300 hover:-translate-y-1 ${
+                  className={`group flex h-full flex-col rounded-xl border p-4 text-left transition-all duration-300 hover:-translate-y-1 ${
                     ativo
                       ? "border-primary bg-primary/10 shadow-[0_0_24px_-2px_var(--color-primary),inset_0_0_0_1px_var(--color-primary)]"
                       : "border-primary/30 bg-card shadow-[0_0_18px_-6px_var(--color-primary)] hover:border-primary/60 hover:bg-primary/5"
@@ -614,15 +614,16 @@ function Estoque() {
                 >
                   <div className="text-2xl">{c.icon}</div>
                   <div className="mt-2 font-display text-sm font-semibold">{c.nome}</div>
-                  <div className="text-xs text-muted-foreground">{total} produto(s)</div>
+                  <div className="mt-auto pt-1 text-xs text-muted-foreground">{total} produto(s)</div>
                 </button>
+
               );
             })}
           </section>
         )}
 
         {/* Filtros / ações em lote */}
-        <div className="mb-8 grid grid-cols-1 gap-3 sm:flex sm:flex-wrap sm:justify-end">
+        <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-5">
           <button
             type="button"
             onClick={() => setFiltroRepor(filtroRepor === "repor" ? null : "repor")}
