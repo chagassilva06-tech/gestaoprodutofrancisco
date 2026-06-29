@@ -23,7 +23,18 @@ export function ConfirmModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
       <div className="w-full max-w-sm rounded-2xl border border-primary/30 bg-card p-6 shadow-[0_0_40px_-8px_var(--color-primary)]">
-        <h3 className="font-display text-lg font-semibold text-foreground">{title}</h3>
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="font-display text-lg font-semibold text-foreground">{title}</h3>
+          <button
+            type="button"
+            onClick={onCancel}
+            aria-label="Fechar"
+            title="Fechar"
+            className="-mr-1 -mt-1 rounded-lg px-2 py-1 text-lg leading-none text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+          >
+            ✕
+          </button>
+        </div>
         {description && (
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
         )}

@@ -77,9 +77,20 @@ export function ProductFormModal({ open, product, onSave, onClose }: Props) {
         onSubmit={submit}
         className="my-8 w-full max-w-lg rounded-2xl border border-primary/30 bg-card p-6 shadow-[0_0_40px_-8px_var(--color-primary)]"
       >
-        <h3 className="font-display text-lg font-semibold text-foreground">
-          {product ? "✏️ Editar produto" : "➕ Novo produto"}
-        </h3>
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="font-display text-lg font-semibold text-foreground">
+            {product ? "✏️ Editar produto" : "➕ Novo produto"}
+          </h3>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Fechar"
+            title="Fechar"
+            className="-mr-1 -mt-1 rounded-lg px-2 py-1 text-lg leading-none text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+          >
+            ✕
+          </button>
+        </div>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           <label className="text-sm">

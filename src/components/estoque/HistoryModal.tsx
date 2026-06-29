@@ -27,9 +27,20 @@ export function HistoryModal({ open, movements, onClose }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
       <div className="my-8 w-full max-w-2xl rounded-2xl border border-primary/30 bg-card p-6 shadow-[0_0_40px_-8px_var(--color-primary)]">
-        <h3 className="font-display text-lg font-semibold text-foreground">
-          🕘 Histórico de movimentações
-        </h3>
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="font-display text-lg font-semibold text-foreground">
+            🕘 Histórico de movimentações
+          </h3>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Fechar"
+            title="Fechar"
+            className="-mr-1 -mt-1 rounded-lg px-2 py-1 text-lg leading-none text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+          >
+            ✕
+          </button>
+        </div>
         <p className="mt-1 text-sm text-muted-foreground">
           Registro de entradas, saídas e ajustes do estoque.
         </p>
