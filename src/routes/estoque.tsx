@@ -623,7 +623,7 @@ function Estoque() {
         )}
 
         {/* Filtros / ações em lote */}
-        <div className="mb-8 grid grid-cols-1 gap-3 sm:flex sm:flex-wrap sm:justify-end">
+        <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-5">
           <button
             type="button"
             onClick={() => setFiltroRepor(filtroRepor === "repor" ? null : "repor")}
