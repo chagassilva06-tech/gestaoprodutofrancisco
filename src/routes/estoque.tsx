@@ -432,7 +432,7 @@ function Estoque() {
 
         {/* Alerta / contador */}
         <div
-          className={`mb-6 flex items-center justify-center gap-3 rounded-xl border px-5 py-3 text-sm font-semibold ${
+          className={`mb-3 inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-semibold ${
             itensAbaixo > 0
               ? "border-red-700/60 bg-red-950/30 text-red-200 shadow-[0_0_24px_-6px_rgba(153,27,27,0.85)]"
               : "border-primary/40 bg-primary/10 text-foreground shadow-[0_0_18px_-6px_var(--color-primary)]"
