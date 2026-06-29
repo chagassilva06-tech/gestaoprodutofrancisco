@@ -409,7 +409,7 @@ function Estoque() {
   }
 
   const btnAcao =
-    "rounded-xl border px-5 py-3 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5";
+    "flex items-center justify-center text-center rounded-xl border px-5 py-3 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5";
 
   return (
     <div className="min-h-screen bg-background px-4 py-10 sm:py-16">
