@@ -97,7 +97,7 @@ function Estoque() {
     if (prod.error || cat.error || mov.error) {
       toast.error("Erro ao carregar os dados da nuvem.");
     }
-    setProducts((prod.data as Product[]) ?? []);
+    setProducts(ordenarPorCodigo((prod.data as Product[]) ?? []));
     setCategories((cat.data as Category[]) ?? []);
     setMovements((mov.data as Movement[]) ?? []);
     setCarregando(false);
