@@ -475,14 +475,14 @@ function Estoque() {
           <button
             type="button"
             onClick={() => exportarCSV(resultados, filtroRepor === "repor")}
-            className="rounded-xl border border-primary/40 bg-card px-3 py-2.5 text-xs font-semibold text-foreground transition hover:bg-primary/10"
+            className="rounded-xl border border-primary/40 bg-card px-3 py-3 text-sm font-semibold text-foreground transition hover:bg-primary/10"
           >
             📊 Exportar Excel (CSV)
           </button>
           <button
             type="button"
             onClick={() => exportarPDF(resultados, filtroRepor === "repor")}
-            className="rounded-xl border border-primary/40 bg-card px-3 py-2.5 text-xs font-semibold text-foreground transition hover:bg-primary/10"
+            className="rounded-xl border border-primary/40 bg-card px-3 py-3 text-sm font-semibold text-foreground transition hover:bg-primary/10"
           >
             📄 Exportar PDF
           </button>
@@ -494,11 +494,12 @@ function Estoque() {
                 true,
               )
             }
-            className="col-span-2 rounded-xl border border-red-900/50 bg-card px-3 py-2.5 text-xs font-semibold text-red-200 transition hover:bg-red-950/30"
+            className="rounded-xl border border-red-900/50 bg-card px-3 py-3 text-sm font-semibold text-red-200 transition hover:bg-red-950/30"
           >
             📄 PDF dos itens a repor
           </button>
         </div>
+
 
         {/* Campo de busca */}
         <div className="mb-8">
