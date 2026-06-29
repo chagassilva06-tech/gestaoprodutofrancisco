@@ -748,7 +748,8 @@ function Estoque() {
                         <button
                           type="button"
                           onClick={() => setProductModal({ open: true, product: p })}
-                          aria-label="Editar"
+                          aria-label="Editar produto"
+                          title="Editar produto"
                           className="rounded-lg border border-primary/40 px-2.5 py-1 text-xs font-semibold text-foreground transition hover:bg-primary/10"
                         >
                           ✏️
@@ -756,7 +757,8 @@ function Estoque() {
                         <button
                           type="button"
                           onClick={() => excluirProduto(p)}
-                          aria-label="Excluir"
+                          aria-label="Excluir produto"
+                          title="Excluir produto"
                           className="rounded-lg border border-red-900/50 px-2.5 py-1 text-xs font-semibold text-red-300 transition hover:bg-red-950/40"
                         >
                           🗑️
