@@ -147,7 +147,7 @@ function Estoque() {
   const ajustarEstoque = (product: Product, sinal: 1 | -1) => {
     const valor = Number(reposicoes[product.id]);
     if (!Number.isFinite(valor) || valor <= 0) {
-      toast.error("Informe uma quantidade válida.");
+      toast.error("Informe uma quantidade válida.", { closeButton: true });
       return;
     }
     if (sinal > 0 && product.quantidade + valor > product.minimo) {
