@@ -225,9 +225,7 @@ function Estoque() {
         return;
       }
       const novo = data as Product;
-      setProducts((prev) =>
-        [...prev, novo].sort((a, b) => a.produto.localeCompare(b.produto)),
-      );
+      setProducts((prev) => ordenarPorCodigo([...prev, novo]));
       const mov = {
         user_id: user.id,
         product_id: novo.id,
