@@ -606,7 +606,7 @@ function Estoque() {
                   key={c.id}
                   type="button"
                   onClick={() => setFiltroCard(ativo ? null : c.termo)}
-                  className={`group rounded-xl border p-4 text-left transition-all duration-300 hover:-translate-y-1 ${
+                  className={`group flex h-full flex-col rounded-xl border p-4 text-left transition-all duration-300 hover:-translate-y-1 ${
                     ativo
                       ? "border-primary bg-primary/10 shadow-[0_0_24px_-2px_var(--color-primary),inset_0_0_0_1px_var(--color-primary)]"
                       : "border-primary/30 bg-card shadow-[0_0_18px_-6px_var(--color-primary)] hover:border-primary/60 hover:bg-primary/5"
@@ -614,8 +614,9 @@ function Estoque() {
                 >
                   <div className="text-2xl">{c.icon}</div>
                   <div className="mt-2 font-display text-sm font-semibold">{c.nome}</div>
-                  <div className="text-xs text-muted-foreground">{total} produto(s)</div>
+                  <div className="mt-auto pt-1 text-xs text-muted-foreground">{total} produto(s)</div>
                 </button>
+
               );
             })}
           </section>
