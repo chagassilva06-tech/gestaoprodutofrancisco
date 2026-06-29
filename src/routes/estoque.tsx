@@ -40,6 +40,16 @@ type Confirmacao = {
   onConfirm: () => void;
 };
 
+const ordenarPorCodigo = (lista: Product[]) =>
+  [...lista].sort((a, b) =>
+    (a.codigo || "").localeCompare(b.codigo || "", undefined, {
+      numeric: true,
+      sensitivity: "base",
+    }),
+  );
+
+
+
 function Estoque() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
@@ -87,7 +97,7 @@ function Estoque() {
     if (prod.error || cat.error || mov.error) {
       toast.error("Erro ao carregar os dados da nuvem.");
     }
-    setProducts((prod.data as Product[]) ?? []);
+    setProducts(ordenarPorCodigo((prod.data as Product[]) ?? []));
     setCategories((cat.data as Category[]) ?? []);
     setMovements((mov.data as Movement[]) ?? []);
     setCarregando(false);
@@ -187,7 +197,7 @@ function Estoque() {
         return;
       }
       setProducts((prev) =>
-        prev.map((p) => (p.id === editando.id ? { ...p, ...form } : p)),
+        ordenarPorCodigo(prev.map((p) => (p.id === editando.id ? { ...p, ...form } : p))),
       );
       if (form.quantidade !== editando.quantidade) {
         const mov = {
@@ -215,9 +225,7 @@ function Estoque() {
         return;
       }
       const novo = data as Product;
-      setProducts((prev) =>
-        [...prev, novo].sort((a, b) => a.produto.localeCompare(b.produto)),
-      );
+      setProducts((prev) => ordenarPorCodigo([...prev, novo]));
       const mov = {
         user_id: user.id,
         product_id: novo.id,
