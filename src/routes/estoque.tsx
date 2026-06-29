@@ -150,14 +150,18 @@ function Estoque() {
       toast.error("Informe uma quantidade válida.", { closeButton: true });
       return;
     }
+    if (sinal > 0 && product.quantidade >= product.minimo) {
+      toast.error("Limite Excedido!", {
+        closeButton: true,
+        description: `O estoque já está 100% (${product.minimo} un.). Não é possível dar entrada.`,
+      });
+      return;
+    }
     if (sinal > 0 && product.quantidade + valor > product.minimo) {
       const restante = Math.max(0, product.minimo - product.quantidade);
       toast.error("Quantidade acima do mínimo", {
         closeButton: true,
-        description:
-          restante > 0
-            ? `O estoque não pode ultrapassar o mínimo de ${product.minimo} un. Você pode adicionar no máximo ${restante} un.`
-            : `O estoque já atingiu o mínimo de ${product.minimo} un.`,
+        description: `O estoque não pode ultrapassar o mínimo de ${product.minimo} un. Você pode adicionar no máximo ${restante} un.`,
       });
       return;
     }
