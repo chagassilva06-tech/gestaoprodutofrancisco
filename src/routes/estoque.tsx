@@ -197,7 +197,7 @@ function Estoque() {
         return;
       }
       setProducts((prev) =>
-        prev.map((p) => (p.id === editando.id ? { ...p, ...form } : p)),
+        ordenarPorCodigo(prev.map((p) => (p.id === editando.id ? { ...p, ...form } : p))),
       );
       if (form.quantidade !== editando.quantidade) {
         const mov = {
