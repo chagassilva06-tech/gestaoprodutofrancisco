@@ -128,10 +128,10 @@ function Index() {
             {modo === "entrar" ? "Área restrita" : "Novo cadastro"}
           </span>
           <h1 className="mt-5 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-            {modo === "entrar" ? "Entre com sua conta" : "Criar nova conta"}
-          </h1>
-          <p className="mt-4 font-display text-lg font-semibold tracking-tight text-primary">
             📦 Inventory Control
+          </h1>
+          <p className="mt-3 text-base font-normal text-foreground">
+            {modo === "entrar" ? "Entre com sua conta" : "Criar nova conta"}
           </p>
           <p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
             {modo === "entrar"
