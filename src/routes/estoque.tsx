@@ -492,7 +492,11 @@ function Estoque() {
           </button>
           <button
             type="button"
-            onClick={() => exportarPDF(resultados, filtroRepor === "repor")}
+            onClick={() =>
+              exportarPDF(resultados, filtroRepor === "repor").catch(() =>
+                toast.error("Não foi possível gerar o PDF."),
+              )
+            }
             className="rounded-xl border border-primary/40 bg-card px-3 py-3 text-sm font-semibold text-foreground transition hover:bg-primary/10"
           >
             📄 Exportar PDF
@@ -503,7 +507,7 @@ function Estoque() {
               exportarPDF(
                 products.filter((p) => p.quantidade < p.minimo),
                 true,
-              )
+              ).catch(() => toast.error("Não foi possível gerar o PDF."))
             }
             className="rounded-xl border border-red-900/50 bg-card px-3 py-3 text-sm font-semibold text-red-200 transition hover:bg-red-950/30"
           >
