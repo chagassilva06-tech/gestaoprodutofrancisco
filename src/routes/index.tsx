@@ -213,6 +213,19 @@ function Index() {
                   {show ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
+              {modo === "entrar" && (
+                <div className="mt-2 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={handleForgot}
+                    disabled={busy}
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-primary transition hover:underline disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    <KeyRound className="h-3.5 w-3.5" />
+                    Esqueceu a senha?
+                  </button>
+                </div>
+              )}
             </div>
 
             <button
