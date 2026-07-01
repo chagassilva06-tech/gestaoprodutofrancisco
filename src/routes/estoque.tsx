@@ -865,33 +865,35 @@ function Estoque() {
         </footer>
       </div>
 
-      <ProductFormModal
-        open={productModal.open}
-        product={productModal.product}
-        onSave={salvarProduto}
-        onClose={() => setProductModal({ open: false, product: null })}
-      />
-      <CategoryModal
-        open={categoryOpen}
-        categories={categories}
-        onAdd={adicionarCategoria}
-        onDelete={excluirCategoria}
-        onClose={() => setCategoryOpen(false)}
-      />
-      <HistoryModal
-        open={historyOpen}
-        movements={movements}
-        onClose={() => setHistoryOpen(false)}
-      />
-      <ConfirmModal
-        open={confirm.open}
-        title={confirm.title}
-        description={confirm.description}
-        confirmLabel={confirm.confirmLabel}
-        danger={confirm.danger}
-        onConfirm={confirm.onConfirm}
-        onCancel={() => setConfirm((c) => ({ ...c, open: false }))}
-      />
+      <Suspense fallback={null}>
+        <ProductFormModal
+          open={productModal.open}
+          product={productModal.product}
+          onSave={salvarProduto}
+          onClose={() => setProductModal({ open: false, product: null })}
+        />
+        <CategoryModal
+          open={categoryOpen}
+          categories={categories}
+          onAdd={adicionarCategoria}
+          onDelete={excluirCategoria}
+          onClose={() => setCategoryOpen(false)}
+        />
+        <HistoryModal
+          open={historyOpen}
+          movements={movements}
+          onClose={() => setHistoryOpen(false)}
+        />
+        <ConfirmModal
+          open={confirm.open}
+          title={confirm.title}
+          description={confirm.description}
+          confirmLabel={confirm.confirmLabel}
+          danger={confirm.danger}
+          onConfirm={confirm.onConfirm}
+          onCancel={() => setConfirm((c) => ({ ...c, open: false }))}
+        />
+      </Suspense>
     </div>
   );
 }
