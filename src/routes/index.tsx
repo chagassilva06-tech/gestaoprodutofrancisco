@@ -132,7 +132,7 @@ function Index() {
           </h1>
           <p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
             {modo === "entrar"
-              ? "Informe seu e-mail e senha para abrir o Controle de Inventário na nuvem."
+              ? "Informe seu e-mail e senha para abrir o Inventory Control na nuvem."
               : "Crie sua conta para salvar o estoque na nuvem e acessar de qualquer aparelho."}
           </p>
         </header>
