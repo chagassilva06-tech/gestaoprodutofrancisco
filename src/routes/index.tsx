@@ -34,6 +34,7 @@ function Index() {
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [emailDuplicado, setEmailDuplicado] = useState(false);
 
   useEffect(() => {
     if (!loading && session) navigate({ to: "/estoque" });
