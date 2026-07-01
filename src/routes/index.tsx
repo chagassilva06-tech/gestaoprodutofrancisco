@@ -159,6 +159,17 @@ function Index() {
             ))}
           </div>
 
+          {/* Aviso destacado ao alternar para Criar conta */}
+          {modo === "criar" && (
+            <div
+              key="banner-criar"
+              className="mb-7 flex animate-in fade-in slide-in-from-top-2 items-center gap-3 rounded-2xl border border-success/50 bg-success/10 px-4 py-3 text-sm font-medium text-success duration-300"
+            >
+              <UserPlus className="h-5 w-5 shrink-0" />
+              Você está criando uma nova conta. Preencha os dados abaixo para cadastrar.
+            </div>
+          )}
+
           <div className="grid gap-7">
             <div>
               <label htmlFor="email" className="mb-2 block text-sm font-medium">
