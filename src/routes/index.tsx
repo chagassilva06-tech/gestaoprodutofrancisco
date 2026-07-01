@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Mail, Lock, Eye, EyeOff, ArrowRight, UserPlus } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, UserPlus, KeyRound } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -87,16 +87,48 @@ function Index() {
     }
   }
 
+  async function handleForgot() {
+    if (busy) return;
+    const mail = email.trim();
+    if (!mail) {
+      toast.error("Informe seu e-mail para receber o link de redefinição.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(mail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      toast.success("Enviamos um link de redefinição para o seu e-mail.");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Falha ao enviar o link.";
+      toast.error(msg);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-[30.5rem]">
         <header className="mb-8 text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-card px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-primary shadow-[0_0_18px_-6px_var(--color-primary)]">
-            <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />
-            Área restrita
+          <span
+            className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium uppercase tracking-widest shadow-[0_0_18px_-6px_var(--color-primary)] transition-colors duration-300 ${
+              modo === "criar"
+                ? "border-success/50 bg-success/10 text-success"
+                : "border-primary/40 bg-card text-primary"
+            }`}
+          >
+            <span
+              className={`h-2 w-2 rounded-full shadow-[0_0_10px_var(--color-primary)] transition-colors duration-300 ${
+                modo === "criar" ? "bg-success" : "bg-primary"
+              }`}
+            />
+            {modo === "entrar" ? "Área restrita" : "Novo cadastro"}
           </span>
           <h1 className="mt-5 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-            Product Management
+            {modo === "entrar" ? "Entre com sua conta" : "Criar nova conta"}
           </h1>
           <p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
             {modo === "entrar"
@@ -126,6 +158,17 @@ function Index() {
               </button>
             ))}
           </div>
+
+          {/* Aviso destacado ao alternar para Criar conta */}
+          {modo === "criar" && (
+            <div
+              key="banner-criar"
+              className="mb-7 flex animate-in fade-in slide-in-from-top-2 items-center gap-3 rounded-2xl border border-success/50 bg-success/10 px-4 py-3 text-sm font-medium text-success duration-300"
+            >
+              <UserPlus className="h-5 w-5 shrink-0" />
+              Você está criando uma nova conta. Preencha os dados abaixo para cadastrar.
+            </div>
+          )}
 
           <div className="grid gap-7">
             <div>
@@ -170,6 +213,19 @@ function Index() {
                   {show ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
+              {modo === "entrar" && (
+                <div className="mt-2 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={handleForgot}
+                    disabled={busy}
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-primary transition hover:underline disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    <KeyRound className="h-3.5 w-3.5" />
+                    Esqueceu a senha?
+                  </button>
+                </div>
+              )}
             </div>
 
             <button
