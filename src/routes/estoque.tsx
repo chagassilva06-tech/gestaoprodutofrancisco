@@ -457,7 +457,11 @@ function Estoque() {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
                 </span>
-                <span className="truncate">{user.email}</span>
+                <span className="truncate">
+                  {(user.user_metadata?.full_name as string) ||
+                    (user.user_metadata?.name as string) ||
+                    user.email?.split("@")[0]}
+                </span>
               </span>
             )}
           </div>
