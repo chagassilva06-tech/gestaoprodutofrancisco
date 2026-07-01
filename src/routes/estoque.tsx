@@ -446,10 +446,21 @@ function Estoque() {
 
 
 
-          <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-card px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-primary shadow-[0_0_18px_-6px_var(--color-primary)]">
-            <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />
-            Controle de Inventário
-          </span>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-card px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-primary shadow-[0_0_18px_-6px_var(--color-primary)]">
+              <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />
+              Controle de Inventário
+            </span>
+            {user && (
+              <span className="inline-flex max-w-full items-center gap-2 rounded-full border border-success/50 bg-success/10 px-4 py-1.5 text-xs font-medium text-success shadow-[0_0_18px_-6px_var(--color-primary)]">
+                <span className="relative flex h-2 w-2 shrink-0">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
+                </span>
+                <span className="truncate">{user.email}</span>
+              </span>
+            )}
+          </div>
           <p className="mt-2 text-xs font-medium tracking-wide text-muted-foreground">
             By Francisco Chagas
           </p>
