@@ -9,17 +9,17 @@ export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Acesso — Controle de Inventário" },
+      { title: "Acesso — Inventory Control" },
       {
         name: "description",
         content:
-          "Tela de acesso ao Controle de Inventário. Informe e-mail e senha para entrar na nuvem.",
+          "Tela de acesso ao Inventory Control. Informe e-mail e senha para entrar na nuvem.",
       },
-      { property: "og:title", content: "Acesso — Controle de Inventário" },
+      { property: "og:title", content: "Acesso — Inventory Control" },
       {
         property: "og:description",
         content:
-          "Tela de acesso ao Controle de Inventário. Informe e-mail e senha para entrar na nuvem.",
+          "Tela de acesso ao Inventory Control. Informe e-mail e senha para entrar na nuvem.",
       },
     ],
   }),
