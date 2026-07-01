@@ -113,6 +113,9 @@ function Index() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-[30.5rem]">
         <header className="mb-8 text-center">
+          <p className="mb-4 font-display text-lg font-semibold tracking-tight text-primary">
+            📦 Inventory Control
+          </p>
           <span
             className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium uppercase tracking-widest shadow-[0_0_18px_-6px_var(--color-primary)] transition-colors duration-300 ${
               modo === "criar"
