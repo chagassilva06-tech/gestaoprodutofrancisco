@@ -213,7 +213,7 @@ function Index() {
               <label htmlFor="password" className="mb-2 block text-sm font-medium">
                 Senha
               </label>
-              <div className="flex items-center gap-3 rounded-2xl bg-background px-4 py-1 shadow-[inset_6px_6px_12px_rgba(0,0,0,0.55),inset_-6px_-6px_12px_rgba(255,255,255,0.04)] transition focus-within:shadow-[inset_6px_6px_12px_rgba(0,0,0,0.6),inset_-6px_-6px_12px_rgba(255,255,255,0.05),0_0_18px_-4px_var(--color-primary)]">
+              <div className="flex items-center gap-3 rounded-2xl bg-card px-4 py-1 shadow-[inset_6px_6px_12px_rgba(0,0,0,0.55),inset_-6px_-6px_12px_rgba(255,255,255,0.07)] transition focus-within:shadow-[inset_6px_6px_12px_rgba(0,0,0,0.6),inset_-6px_-6px_12px_rgba(255,255,255,0.08),0_0_18px_-4px_var(--color-primary)]">
                 <Lock className="h-5 w-5 shrink-0 text-primary" />
                 <input
                   id="password"
