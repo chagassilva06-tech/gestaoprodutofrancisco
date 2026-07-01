@@ -425,14 +425,26 @@ function Estoque() {
   return (
     <div className="min-h-screen bg-background px-4 py-10 sm:py-16">
       <div className="mx-auto w-full max-w-4xl">
+        <div className="mb-4 flex justify-end sm:hidden">
+          <button
+            type="button"
+            onClick={sair}
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-primary/40 bg-card px-4 py-2 text-sm font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] transition hover:bg-primary/10"
+          >
+            🚪 Sair da conta
+          </button>
+        </div>
+
         <header className="relative mb-8 text-center">
           <button
             type="button"
             onClick={sair}
-            className="absolute right-0 top-0 inline-flex items-center justify-center gap-2 rounded-lg border border-primary/40 bg-card px-4 py-2 text-sm font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] transition hover:bg-primary/10"
+            className="absolute right-0 top-0 hidden items-center justify-center gap-2 rounded-lg border border-primary/40 bg-card px-4 py-2 text-sm font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] transition hover:bg-primary/10 sm:inline-flex"
           >
             🚪 Sair da conta
           </button>
+
+
 
           <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-card px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-primary shadow-[0_0_18px_-6px_var(--color-primary)]">
             <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />
