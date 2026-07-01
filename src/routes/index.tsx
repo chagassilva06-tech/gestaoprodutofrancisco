@@ -59,7 +59,23 @@ function Index() {
           password,
           options: { emailRedirectTo: window.location.origin },
         });
-        if (error) throw error;
+        if (error) {
+          if (
+            error.message.includes("already registered") ||
+            error.message.includes("already been registered") ||
+            error.message.includes("User already")
+          ) {
+            setEmailDuplicado(true);
+            return;
+          }
+          throw error;
+        }
+        // Supabase não retorna erro para e-mail já cadastrado (proteção anti-enumeração):
+        // nesse caso o usuário volta sem "identities". Detectamos e bloqueamos a criação.
+        if (data.user && (data.user.identities?.length ?? 0) === 0) {
+          setEmailDuplicado(true);
+          return;
+        }
         if (data.session) {
           toast.success("Conta criada! Entrando…");
           navigate({ to: "/estoque" });
