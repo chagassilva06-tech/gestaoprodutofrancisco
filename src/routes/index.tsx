@@ -270,6 +270,64 @@ function Index() {
           By Francisco Chagas — todos os direitos reservados 2026
         </p>
       </div>
+
+      {emailDuplicado && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setEmailDuplicado(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-sm animate-in fade-in zoom-in-95 rounded-[1.75rem] border border-warning/40 bg-card p-7 text-center shadow-[0_0_40px_-8px_var(--color-primary)] duration-200"
+          >
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-warning/50 bg-warning/10 text-warning">
+              <AlertTriangle className="h-7 w-7" />
+            </div>
+            <h2 className="text-lg font-bold text-foreground">E-mail já cadastrado</h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Você já cadastrou esse e-mail. Entre com um novo e-mail ou recupere sua senha de
+              acesso.
+            </p>
+            <div className="mt-6 grid gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setEmailDuplicado(false);
+                  setModo("entrar");
+                }}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-primary to-success px-5 py-3 text-sm font-semibold text-primary-foreground shadow-[0_0_28px_-6px_var(--color-primary)] transition active:scale-[0.99]"
+              >
+                <ArrowRight className="h-4 w-4" />
+                Fazer login
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmailDuplicado(false);
+                  setModo("entrar");
+                  void handleForgot();
+                }}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-primary/40 bg-background px-5 py-3 text-sm font-semibold text-primary transition hover:bg-primary/10"
+              >
+                <KeyRound className="h-4 w-4" />
+                Recuperar senha
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmailDuplicado(false);
+                  setEmail("");
+                }}
+                className="mt-1 text-xs font-medium text-muted-foreground transition hover:text-foreground"
+              >
+                Usar outro e-mail
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
