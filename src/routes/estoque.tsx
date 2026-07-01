@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -11,10 +11,21 @@ import {
   type Product,
 } from "@/lib/estoque";
 import { exportarCSV, exportarPDF } from "@/lib/export-estoque";
-import { ConfirmModal } from "@/components/estoque/ConfirmModal";
-import { ProductFormModal, type ProductFormData } from "@/components/estoque/ProductFormModal";
-import { CategoryModal } from "@/components/estoque/CategoryModal";
-import { HistoryModal } from "@/components/estoque/HistoryModal";
+import type { ProductFormData } from "@/components/estoque/ProductFormModal";
+
+// Modais carregados sob demanda (code-splitting) para reduzir o JS inicial.
+const ConfirmModal = lazy(() =>
+  import("@/components/estoque/ConfirmModal").then((m) => ({ default: m.ConfirmModal })),
+);
+const ProductFormModal = lazy(() =>
+  import("@/components/estoque/ProductFormModal").then((m) => ({ default: m.ProductFormModal })),
+);
+const CategoryModal = lazy(() =>
+  import("@/components/estoque/CategoryModal").then((m) => ({ default: m.CategoryModal })),
+);
+const HistoryModal = lazy(() =>
+  import("@/components/estoque/HistoryModal").then((m) => ({ default: m.HistoryModal })),
+);
 
 export const Route = createFileRoute("/estoque")({
   ssr: false,
@@ -481,7 +492,11 @@ function Estoque() {
           </button>
           <button
             type="button"
-            onClick={() => exportarPDF(resultados, filtroRepor === "repor")}
+            onClick={() =>
+              exportarPDF(resultados, filtroRepor === "repor").catch(() =>
+                toast.error("Não foi possível gerar o PDF."),
+              )
+            }
             className="rounded-xl border border-primary/40 bg-card px-3 py-3 text-sm font-semibold text-foreground transition hover:bg-primary/10"
           >
             📄 Exportar PDF
@@ -492,7 +507,7 @@ function Estoque() {
               exportarPDF(
                 products.filter((p) => p.quantidade < p.minimo),
                 true,
-              )
+              ).catch(() => toast.error("Não foi possível gerar o PDF."))
             }
             className="rounded-xl border border-red-900/50 bg-card px-3 py-3 text-sm font-semibold text-red-200 transition hover:bg-red-950/30"
           >
@@ -854,33 +869,35 @@ function Estoque() {
         </footer>
       </div>
 
-      <ProductFormModal
-        open={productModal.open}
-        product={productModal.product}
-        onSave={salvarProduto}
-        onClose={() => setProductModal({ open: false, product: null })}
-      />
-      <CategoryModal
-        open={categoryOpen}
-        categories={categories}
-        onAdd={adicionarCategoria}
-        onDelete={excluirCategoria}
-        onClose={() => setCategoryOpen(false)}
-      />
-      <HistoryModal
-        open={historyOpen}
-        movements={movements}
-        onClose={() => setHistoryOpen(false)}
-      />
-      <ConfirmModal
-        open={confirm.open}
-        title={confirm.title}
-        description={confirm.description}
-        confirmLabel={confirm.confirmLabel}
-        danger={confirm.danger}
-        onConfirm={confirm.onConfirm}
-        onCancel={() => setConfirm((c) => ({ ...c, open: false }))}
-      />
+      <Suspense fallback={null}>
+        <ProductFormModal
+          open={productModal.open}
+          product={productModal.product}
+          onSave={salvarProduto}
+          onClose={() => setProductModal({ open: false, product: null })}
+        />
+        <CategoryModal
+          open={categoryOpen}
+          categories={categories}
+          onAdd={adicionarCategoria}
+          onDelete={excluirCategoria}
+          onClose={() => setCategoryOpen(false)}
+        />
+        <HistoryModal
+          open={historyOpen}
+          movements={movements}
+          onClose={() => setHistoryOpen(false)}
+        />
+        <ConfirmModal
+          open={confirm.open}
+          title={confirm.title}
+          description={confirm.description}
+          confirmLabel={confirm.confirmLabel}
+          danger={confirm.danger}
+          onConfirm={confirm.onConfirm}
+          onCancel={() => setConfirm((c) => ({ ...c, open: false }))}
+        />
+      </Suspense>
     </div>
   );
 }

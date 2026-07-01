@@ -1,5 +1,3 @@
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import type { Product } from "@/lib/estoque";
 
 function baixarArquivo(conteudo: BlobPart, nome: string, tipo: string) {
@@ -47,7 +45,14 @@ export function exportarCSV(produtos: Product[], apenasRepor: boolean) {
   );
 }
 
-export function exportarPDF(produtos: Product[], apenasRepor: boolean) {
+// jsPDF/autotable são bibliotecas grandes: carregadas sob demanda (dynamic import)
+// para não pesar no bundle inicial e melhorar o tempo de carregamento/PageSpeed.
+export async function exportarPDF(produtos: Product[], apenasRepor: boolean) {
+  const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
+    import("jspdf"),
+    import("jspdf-autotable"),
+  ]);
+
   const doc = new jsPDF();
   const titulo = apenasRepor ? "Itens que precisam de reposição" : "Relatório de estoque";
 
