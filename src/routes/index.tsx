@@ -113,12 +113,22 @@ function Index() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-[30.5rem]">
         <header className="mb-8 text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-card px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-primary shadow-[0_0_18px_-6px_var(--color-primary)]">
-            <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />
-            Área restrita
+          <span
+            className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium uppercase tracking-widest shadow-[0_0_18px_-6px_var(--color-primary)] transition-colors duration-300 ${
+              modo === "criar"
+                ? "border-success/50 bg-success/10 text-success"
+                : "border-primary/40 bg-card text-primary"
+            }`}
+          >
+            <span
+              className={`h-2 w-2 rounded-full shadow-[0_0_10px_var(--color-primary)] transition-colors duration-300 ${
+                modo === "criar" ? "bg-success" : "bg-primary"
+              }`}
+            />
+            {modo === "entrar" ? "Área restrita" : "Novo cadastro"}
           </span>
           <h1 className="mt-5 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-            Product Management
+            {modo === "entrar" ? "Entre com sua conta" : "Criar nova conta"}
           </h1>
           <p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
             {modo === "entrar"
