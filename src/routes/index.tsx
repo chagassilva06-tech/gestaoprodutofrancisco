@@ -87,6 +87,28 @@ function Index() {
     }
   }
 
+  async function handleForgot() {
+    if (busy) return;
+    const mail = email.trim();
+    if (!mail) {
+      toast.error("Informe seu e-mail para receber o link de redefinição.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(mail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      toast.success("Enviamos um link de redefinição para o seu e-mail.");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Falha ao enviar o link.";
+      toast.error(msg);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-[30.5rem]">
