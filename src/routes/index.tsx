@@ -159,10 +159,10 @@ function Index() {
 
         <form
           onSubmit={handleSubmit}
-          className="rounded-[2rem] border border-transparent bg-background p-8 shadow-[12px_12px_28px_rgba(0,0,0,0.55),-10px_-10px_24px_rgba(255,255,255,0.04)] transition-all duration-500 ease-out hover:border-white/30 hover:shadow-[12px_12px_28px_rgba(0,0,0,0.55),-10px_-10px_24px_rgba(255,255,255,0.04),0_0_24px_rgba(255,255,255,0.12)] sm:p-10"
+          className="rounded-[2rem] border border-white/5 bg-card p-8 shadow-[12px_12px_28px_rgba(0,0,0,0.55),-10px_-10px_24px_rgba(255,255,255,0.08)] transition-all duration-500 ease-out hover:border-white/30 hover:shadow-[12px_12px_28px_rgba(0,0,0,0.55),-10px_-10px_24px_rgba(255,255,255,0.08),0_0_24px_rgba(255,255,255,0.12)] sm:p-10"
         >
           {/* Alternância Entrar / Criar conta */}
-          <div className="mb-7 grid grid-cols-2 gap-2 rounded-2xl bg-background p-1.5 shadow-[inset_4px_4px_10px_rgba(0,0,0,0.5),inset_-4px_-4px_10px_rgba(255,255,255,0.04)]">
+          <div className="mb-7 grid grid-cols-2 gap-2 rounded-2xl bg-card p-1.5 shadow-[inset_4px_4px_10px_rgba(0,0,0,0.5),inset_-4px_-4px_10px_rgba(255,255,255,0.07)]">
             {(["entrar", "criar"] as const).map((m) => (
               <button
                 key={m}
@@ -195,7 +195,7 @@ function Index() {
               <label htmlFor="email" className="mb-2 block text-sm font-medium">
                 E-mail
               </label>
-              <div className="flex items-center gap-3 rounded-2xl bg-background px-4 py-1 shadow-[inset_6px_6px_12px_rgba(0,0,0,0.55),inset_-6px_-6px_12px_rgba(255,255,255,0.04)] transition focus-within:shadow-[inset_6px_6px_12px_rgba(0,0,0,0.6),inset_-6px_-6px_12px_rgba(255,255,255,0.05),0_0_18px_-4px_var(--color-primary)]">
+              <div className="flex items-center gap-3 rounded-2xl bg-card px-4 py-1 shadow-[inset_6px_6px_12px_rgba(0,0,0,0.55),inset_-6px_-6px_12px_rgba(255,255,255,0.07)] transition focus-within:shadow-[inset_6px_6px_12px_rgba(0,0,0,0.6),inset_-6px_-6px_12px_rgba(255,255,255,0.08),0_0_18px_-4px_var(--color-primary)]">
                 <Mail className="h-5 w-5 shrink-0 text-primary" />
                 <input
                   id="email"
@@ -213,7 +213,7 @@ function Index() {
               <label htmlFor="password" className="mb-2 block text-sm font-medium">
                 Senha
               </label>
-              <div className="flex items-center gap-3 rounded-2xl bg-background px-4 py-1 shadow-[inset_6px_6px_12px_rgba(0,0,0,0.55),inset_-6px_-6px_12px_rgba(255,255,255,0.04)] transition focus-within:shadow-[inset_6px_6px_12px_rgba(0,0,0,0.6),inset_-6px_-6px_12px_rgba(255,255,255,0.05),0_0_18px_-4px_var(--color-primary)]">
+              <div className="flex items-center gap-3 rounded-2xl bg-card px-4 py-1 shadow-[inset_6px_6px_12px_rgba(0,0,0,0.55),inset_-6px_-6px_12px_rgba(255,255,255,0.07)] transition focus-within:shadow-[inset_6px_6px_12px_rgba(0,0,0,0.6),inset_-6px_-6px_12px_rgba(255,255,255,0.08),0_0_18px_-4px_var(--color-primary)]">
                 <Lock className="h-5 w-5 shrink-0 text-primary" />
                 <input
                   id="password"
