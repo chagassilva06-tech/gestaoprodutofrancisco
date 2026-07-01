@@ -9,17 +9,17 @@ export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Acesso — Controle de Inventário" },
+      { title: "Acesso — Inventory Control" },
       {
         name: "description",
         content:
-          "Tela de acesso ao Controle de Inventário. Informe e-mail e senha para entrar na nuvem.",
+          "Tela de acesso ao Inventory Control. Informe e-mail e senha para entrar na nuvem.",
       },
-      { property: "og:title", content: "Acesso — Controle de Inventário" },
+      { property: "og:title", content: "Acesso — Inventory Control" },
       {
         property: "og:description",
         content:
-          "Tela de acesso ao Controle de Inventário. Informe e-mail e senha para entrar na nuvem.",
+          "Tela de acesso ao Inventory Control. Informe e-mail e senha para entrar na nuvem.",
       },
     ],
   }),
@@ -113,6 +113,9 @@ function Index() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-[30.5rem]">
         <header className="mb-8 text-center">
+          <p className="mb-4 font-display text-lg font-semibold tracking-tight text-primary">
+            📦 Inventory Control
+          </p>
           <span
             className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium uppercase tracking-widest shadow-[0_0_18px_-6px_var(--color-primary)] transition-colors duration-300 ${
               modo === "criar"
@@ -132,7 +135,7 @@ function Index() {
           </h1>
           <p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
             {modo === "entrar"
-              ? "Informe seu e-mail e senha para abrir o Controle de Inventário na nuvem."
+              ? "Informe seu e-mail e senha para abrir o Inventory Control na nuvem."
               : "Crie sua conta para salvar o estoque na nuvem e acessar de qualquer aparelho."}
           </p>
         </header>
