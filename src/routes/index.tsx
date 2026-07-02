@@ -135,7 +135,7 @@ function Index() {
         style={{ backgroundImage: `url("${authBg.url}")` }}
       />
       {/* Camada escura para manter o auto-relevo e a legibilidade sobre a imagem verde */}
-      <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-background/70 via-background/55 to-background/75 backdrop-blur-[1px]" />
+      <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-background/85 via-background/75 to-background/90 backdrop-blur-[1px]" />
       <div className="relative z-10 w-full max-w-[30.5rem]">
 
 
