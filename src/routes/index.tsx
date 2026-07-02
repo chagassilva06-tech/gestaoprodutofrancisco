@@ -152,12 +152,6 @@ function Index() {
       />
       {/* Camada escura para manter o auto-relevo e a legibilidade sobre a imagem verde */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-background/85 via-background/75 to-background/90 backdrop-blur-[1px]" />
-      {/* Ilustração no canto superior, ao lado do card de login (telas largas) */}
-      <img
-        src={authCorner.url}
-        alt="Ilustração de análise de inventário"
-        className="pointer-events-none absolute right-6 top-6 z-10 hidden w-44 select-none xl:block xl:w-56 2xl:w-64"
-      />
       {/* Área de conteúdo: é a única que rola quando o cartão é maior que a tela */}
       <div className="relative z-10 flex h-full items-center justify-center overflow-y-auto px-4 py-12">
         <div className="w-full max-w-[30.5rem]">
@@ -165,17 +159,23 @@ function Index() {
 
 
         <header className="mb-8 text-center">
-          <h1 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-            📦 Inventory Control
-          </h1>
-          <p className="mt-3 text-base font-normal text-foreground">
+          <div className="flex items-center justify-center gap-3 sm:gap-4">
+            <img
+              src={authCorner.url}
+              alt="Ilustração de análise de inventário"
+              className="w-16 shrink-0 select-none sm:w-20 lg:w-24"
+            />
+            <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">
+              📦 Inventory Control
+            </h1>
+          </div>
+          <p className="mt-4 text-base font-normal text-foreground">
             {modo === "entrar" ? "Entre com sua conta" : "Criar nova conta"}
           </p>
-          <p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
-            {modo === "entrar"
-              ? "Informe seu e-mail e senha para abrir o Inventory Control na nuvem."
-              : "Crie sua conta para salvar o estoque na nuvem e acessar de qualquer aparelho."}
+          <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">
+            Controle de Inventário na nuvem
           </p>
+
         </header>
 
         <form
