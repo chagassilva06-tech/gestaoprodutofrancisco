@@ -303,7 +303,7 @@ function Index() {
           Acesso protegido por e-mail e senha • Dados salvos na nuvem
         </p>
         <p className="mt-2 text-center text-xs text-muted-foreground">
-          By Francisco Chagas — todos os direitos reservados 2026
+          By Francisco Chagas — Todos os direitos reservados 2026
         </p>
       </div>
       </div>
