@@ -128,8 +128,14 @@ function Index() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
-      <div className="w-full max-w-[30.5rem]">
+    <div
+      className="relative flex min-h-screen items-center justify-center bg-background bg-cover bg-center bg-no-repeat px-4 py-12"
+      style={{ backgroundImage: `url("${authBg.url}")` }}
+    >
+      {/* Camada escura para manter o auto-relevo e a legibilidade sobre a imagem verde */}
+      <div className="pointer-events-none absolute inset-0 bg-background/80 backdrop-blur-[2px]" />
+      <div className="relative z-10 w-full max-w-[30.5rem]">
+
         <header className="mb-8 text-center">
           <span
             className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium uppercase tracking-widest shadow-[0_0_18px_-6px_var(--color-primary)] transition-colors duration-300 ${
