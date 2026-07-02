@@ -444,7 +444,7 @@ function Estoque() {
               className="w-20 lg:w-24 xl:w-32"
             />
             <p className="mt-2 text-center text-xs font-semibold tracking-wide text-primary">
-              fchagassilva06
+              By Francisco Chagas
             </p>
           </div>
           <button
