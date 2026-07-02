@@ -165,20 +165,6 @@ function Index() {
 
 
         <header className="mb-8 text-center">
-          <span
-            className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium uppercase tracking-widest shadow-[0_0_18px_-6px_var(--color-primary)] transition-colors duration-300 ${
-              modo === "criar"
-                ? "border-success/50 bg-success/10 text-success"
-                : "border-primary/40 bg-card text-primary"
-            }`}
-          >
-            <span
-              className={`h-2 w-2 rounded-full shadow-[0_0_10px_var(--color-primary)] transition-colors duration-300 ${
-                modo === "criar" ? "bg-success" : "bg-primary"
-              }`}
-            />
-            {modo === "entrar" ? "Área restrita" : "Novo cadastro"}
-          </span>
           <h1 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
             📦 Inventory Control
           </h1>
