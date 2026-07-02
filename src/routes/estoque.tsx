@@ -12,6 +12,7 @@ import {
 } from "@/lib/estoque";
 import { exportarCSV, exportarPDF } from "@/lib/export-estoque";
 import type { ProductFormData } from "@/components/estoque/ProductFormModal";
+import inventoryLogo from "@/assets/inventory-logo.png.asset.json";
 
 // Modais carregados sob demanda (code-splitting) para reduzir o JS inicial.
 const ConfirmModal = lazy(() =>
@@ -436,6 +437,11 @@ function Estoque() {
         </div>
 
         <header className="relative mb-8 text-center">
+          <img
+            src={inventoryLogo.url}
+            alt="Ilustração de controle de inventário"
+            className="pointer-events-none absolute left-0 top-0 hidden w-24 select-none lg:block xl:w-32"
+          />
           <button
             type="button"
             onClick={sair}
@@ -443,6 +449,7 @@ function Estoque() {
           >
             🚪 Sair da conta
           </button>
+
 
 
 
