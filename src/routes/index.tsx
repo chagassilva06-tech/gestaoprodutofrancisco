@@ -182,6 +182,24 @@ function Index() {
           onSubmit={handleSubmit}
           className="rounded-[2rem] border border-white/5 bg-card p-8 shadow-[12px_12px_28px_rgba(0,0,0,0.55),-10px_-10px_24px_rgba(255,255,255,0.08)] transition-all duration-500 ease-out hover:border-white/30 hover:shadow-[12px_12px_28px_rgba(0,0,0,0.55),-10px_-10px_24px_rgba(255,255,255,0.08),0_0_24px_rgba(255,255,255,0.12)] sm:p-10"
         >
+          {/* Selo dentro do card, acima das abas */}
+          <div className="mb-5 flex justify-center">
+            <span
+              className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium uppercase tracking-widest shadow-[0_0_18px_-6px_var(--color-primary)] transition-colors duration-300 ${
+                modo === "criar"
+                  ? "border-success/50 bg-success/10 text-success"
+                  : "border-primary/40 bg-card text-primary"
+              }`}
+            >
+              <span
+                className={`h-2 w-2 rounded-full shadow-[0_0_10px_var(--color-primary)] transition-colors duration-300 ${
+                  modo === "criar" ? "bg-success" : "bg-primary"
+                }`}
+              />
+              {modo === "entrar" ? "Área restrita" : "Novo cadastro"}
+            </span>
+          </div>
+
           {/* Alternância Entrar / Criar conta */}
           <div className="mb-7 grid grid-cols-2 gap-2 rounded-2xl bg-card p-1.5 shadow-[inset_4px_4px_10px_rgba(0,0,0,0.5),inset_-4px_-4px_10px_rgba(255,255,255,0.07)]">
             {(["entrar", "criar"] as const).map((m) => (
