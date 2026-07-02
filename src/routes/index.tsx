@@ -172,11 +172,8 @@ function Index() {
           <p className="mt-4 text-base font-normal text-foreground">
             {modo === "entrar" ? "Entre com sua conta" : "Criar nova conta"}
           </p>
-          <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">
-            Controle de Inventário na nuvem
-          </p>
-
         </header>
+
 
         <form
           onSubmit={handleSubmit}
