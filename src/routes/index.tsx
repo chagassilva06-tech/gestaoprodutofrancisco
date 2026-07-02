@@ -41,6 +41,21 @@ function Index() {
     if (!loading && session) navigate({ to: "/estoque" });
   }, [loading, session, navigate]);
 
+  // Trava a rolagem do documento enquanto a tela de acesso está aberta:
+  // a página inteira não rola junto; apenas o cartão rola internamente se preciso.
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    const prevHtml = html.style.overflow;
+    const prevBody = body.style.overflow;
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    return () => {
+      html.style.overflow = prevHtml;
+      body.style.overflow = prevBody;
+    };
+  }, []);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (busy) return;
