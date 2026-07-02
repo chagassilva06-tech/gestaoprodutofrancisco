@@ -128,15 +128,18 @@ function Index() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-background px-4 py-12">
-      {/* Fundo fixo: nunca se move ao alternar entre Entrar e Criar conta */}
+    <div className="fixed inset-0 bg-background">
+      {/* Fundo fixo: nunca se move ao rolar ou alternar entre Entrar e Criar conta */}
       <div
-        className="pointer-events-none fixed inset-0 bg-cover bg-center bg-no-repeat"
+        className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url("${authBg.url}")` }}
       />
       {/* Camada escura para manter o auto-relevo e a legibilidade sobre a imagem verde */}
-      <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-background/85 via-background/75 to-background/90 backdrop-blur-[1px]" />
-      <div className="relative z-10 w-full max-w-[30.5rem]">
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-background/85 via-background/75 to-background/90 backdrop-blur-[1px]" />
+      {/* Área de conteúdo: é a única que rola quando o cartão é maior que a tela */}
+      <div className="relative z-10 flex h-full items-center justify-center overflow-y-auto px-4 py-12">
+        <div className="w-full max-w-[30.5rem]">
+
 
 
         <header className="mb-8 text-center">
