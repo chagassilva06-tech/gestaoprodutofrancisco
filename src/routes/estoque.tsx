@@ -12,6 +12,7 @@ import {
 } from "@/lib/estoque";
 import { exportarCSV, exportarPDF } from "@/lib/export-estoque";
 import type { ProductFormData } from "@/components/estoque/ProductFormModal";
+import inventoryLogo from "@/assets/inventory-logo.png.asset.json";
 
 // Modais carregados sob demanda (code-splitting) para reduzir o JS inicial.
 const ConfirmModal = lazy(() =>
