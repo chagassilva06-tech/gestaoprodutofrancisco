@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Mail, Lock, Eye, EyeOff, ArrowRight, UserPlus, KeyRound, AlertTriangle } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, UserPlus, KeyRound, AlertTriangle, QrCode, X } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -37,6 +38,8 @@ function Index() {
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
   const [emailDuplicado, setEmailDuplicado] = useState(false);
+  const [qrAberto, setQrAberto] = useState(false);
+  const appUrl = "https://gestaoprodutofrancisco.lovable.app/";
 
   useEffect(() => {
     if (!loading && session) navigate({ to: "/estoque" });
@@ -180,7 +183,7 @@ function Index() {
           className="rounded-[2rem] border border-white/5 bg-card p-8 shadow-[12px_12px_28px_rgba(0,0,0,0.55),-10px_-10px_24px_rgba(255,255,255,0.08)] transition-all duration-500 ease-out hover:border-white/30 hover:shadow-[12px_12px_28px_rgba(0,0,0,0.55),-10px_-10px_24px_rgba(255,255,255,0.08),0_0_24px_rgba(255,255,255,0.12)] sm:p-10"
         >
           {/* Selo dentro do card, acima das abas */}
-          <div className="mb-5 flex justify-center">
+          <div className="mb-5 flex items-center justify-center gap-2">
             <span
               className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium uppercase tracking-widest shadow-[0_0_18px_-6px_var(--color-primary)] transition-colors duration-300 ${
                 modo === "criar"
@@ -195,7 +198,17 @@ function Index() {
               />
               {modo === "entrar" ? "Área restrita" : "Novo cadastro"}
             </span>
+            <button
+              type="button"
+              onClick={() => setQrAberto(true)}
+              aria-label="Compartilhar via QR Code"
+              title="Compartilhar via QR Code"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-primary/40 bg-card text-primary shadow-[0_0_18px_-6px_var(--color-primary)] transition hover:bg-primary/10 active:scale-95"
+            >
+              <QrCode className="h-4 w-4" />
+            </button>
           </div>
+
 
           {/* Alternância Entrar / Criar conta */}
           <div className="mb-7 grid grid-cols-2 gap-2 rounded-2xl bg-card p-1.5 shadow-[inset_4px_4px_10px_rgba(0,0,0,0.5),inset_-4px_-4px_10px_rgba(255,255,255,0.07)]">
@@ -364,6 +377,50 @@ function Index() {
                 Usar outro e-mail
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {qrAberto && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setQrAberto(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-sm animate-in fade-in zoom-in-95 rounded-[1.75rem] border border-primary/30 bg-card p-7 text-center shadow-[0_0_40px_-8px_var(--color-primary)] duration-200"
+          >
+            <button
+              type="button"
+              onClick={() => setQrAberto(false)}
+              aria-label="Fechar"
+              className="absolute right-4 top-4 rounded-full p-1.5 text-muted-foreground transition hover:text-foreground"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-primary/50 bg-primary/10 text-primary">
+              <QrCode className="h-7 w-7" />
+            </div>
+            <h2 className="text-lg font-bold text-foreground">Compartilhar acesso</h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Escaneie o QR Code com a câmera do celular para abrir o Controle de Estoque.
+            </p>
+            <div className="mx-auto mt-6 w-fit rounded-2xl bg-white p-4 shadow-[0_0_28px_-6px_var(--color-primary)]">
+              <QRCodeSVG value={appUrl} size={200} level="M" includeMargin={false} />
+            </div>
+            <p className="mt-4 break-all text-xs font-medium text-primary">{appUrl}</p>
+            <button
+              type="button"
+              onClick={() => {
+                void navigator.clipboard?.writeText(appUrl);
+                toast.success("Link copiado!");
+              }}
+              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-primary/40 bg-background px-5 py-3 text-sm font-semibold text-primary transition hover:bg-primary/10"
+            >
+              Copiar link
+            </button>
           </div>
         </div>
       )}
