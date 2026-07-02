@@ -183,7 +183,7 @@ function Index() {
           className="rounded-[2rem] border border-white/5 bg-card p-8 shadow-[12px_12px_28px_rgba(0,0,0,0.55),-10px_-10px_24px_rgba(255,255,255,0.08)] transition-all duration-500 ease-out hover:border-white/30 hover:shadow-[12px_12px_28px_rgba(0,0,0,0.55),-10px_-10px_24px_rgba(255,255,255,0.08),0_0_24px_rgba(255,255,255,0.12)] sm:p-10"
         >
           {/* Selo dentro do card, acima das abas */}
-          <div className="mb-5 flex justify-center">
+          <div className="mb-5 flex items-center justify-center gap-2">
             <span
               className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium uppercase tracking-widest shadow-[0_0_18px_-6px_var(--color-primary)] transition-colors duration-300 ${
                 modo === "criar"
@@ -198,7 +198,17 @@ function Index() {
               />
               {modo === "entrar" ? "Área restrita" : "Novo cadastro"}
             </span>
+            <button
+              type="button"
+              onClick={() => setQrAberto(true)}
+              aria-label="Compartilhar via QR Code"
+              title="Compartilhar via QR Code"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-primary/40 bg-card text-primary shadow-[0_0_18px_-6px_var(--color-primary)] transition hover:bg-primary/10 active:scale-95"
+            >
+              <QrCode className="h-4 w-4" />
+            </button>
           </div>
+
 
           {/* Alternância Entrar / Criar conta */}
           <div className="mb-7 grid grid-cols-2 gap-2 rounded-2xl bg-card p-1.5 shadow-[inset_4px_4px_10px_rgba(0,0,0,0.5),inset_-4px_-4px_10px_rgba(255,255,255,0.07)]">
