@@ -128,13 +128,16 @@ function Index() {
   }
 
   return (
-    <div
-      className="relative flex min-h-screen items-center justify-center bg-background bg-cover bg-center bg-no-repeat px-4 py-12"
-      style={{ backgroundImage: `url("${authBg.url}")` }}
-    >
+    <div className="relative flex min-h-screen items-center justify-center bg-background px-4 py-12">
+      {/* Fundo fixo: nunca se move ao alternar entre Entrar e Criar conta */}
+      <div
+        className="pointer-events-none fixed inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url("${authBg.url}")` }}
+      />
       {/* Camada escura para manter o auto-relevo e a legibilidade sobre a imagem verde */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-background/70 via-background/55 to-background/75 backdrop-blur-[1px]" />
+      <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-background/70 via-background/55 to-background/75 backdrop-blur-[1px]" />
       <div className="relative z-10 w-full max-w-[30.5rem]">
+
 
         <header className="mb-8 text-center">
           <span
