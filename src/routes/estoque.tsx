@@ -440,7 +440,7 @@ function Estoque() {
           <img
             src={inventoryLogo.url}
             alt="Ilustração de controle de inventário"
-            className="pointer-events-none absolute left-0 top-0 hidden w-24 select-none lg:block xl:w-32"
+            className="pointer-events-none absolute left-0 top-0 hidden w-20 select-none md:block lg:w-24 xl:w-32"
           />
           <button
             type="button"
