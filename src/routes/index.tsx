@@ -380,6 +380,50 @@ function Index() {
           </div>
         </div>
       )}
+
+      {qrAberto && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setQrAberto(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-sm animate-in fade-in zoom-in-95 rounded-[1.75rem] border border-primary/30 bg-card p-7 text-center shadow-[0_0_40px_-8px_var(--color-primary)] duration-200"
+          >
+            <button
+              type="button"
+              onClick={() => setQrAberto(false)}
+              aria-label="Fechar"
+              className="absolute right-4 top-4 rounded-full p-1.5 text-muted-foreground transition hover:text-foreground"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-primary/50 bg-primary/10 text-primary">
+              <QrCode className="h-7 w-7" />
+            </div>
+            <h2 className="text-lg font-bold text-foreground">Compartilhar acesso</h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Escaneie o QR Code com a câmera do celular para abrir o Controle de Estoque.
+            </p>
+            <div className="mx-auto mt-6 w-fit rounded-2xl bg-white p-4 shadow-[0_0_28px_-6px_var(--color-primary)]">
+              <QRCodeSVG value={appUrl} size={200} level="M" includeMargin={false} />
+            </div>
+            <p className="mt-4 break-all text-xs font-medium text-primary">{appUrl}</p>
+            <button
+              type="button"
+              onClick={() => {
+                void navigator.clipboard?.writeText(appUrl);
+                toast.success("Link copiado!");
+              }}
+              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-primary/40 bg-background px-5 py-3 text-sm font-semibold text-primary transition hover:bg-primary/10"
+            >
+              Copiar link
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
