@@ -475,7 +475,7 @@ function Estoque() {
           <p className="mt-2 text-xs font-medium tracking-wide text-muted-foreground">
             By Francisco Chagas
           </p>
-          <h1 className="mt-4 font-display text-4xl font-bold tracking-tight sm:text-5xl">
+          <h1 className="mt-4 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
             Gestão de produtos
           </h1>
           <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
