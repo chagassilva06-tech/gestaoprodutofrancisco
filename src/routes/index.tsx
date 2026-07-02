@@ -165,8 +165,8 @@ function Index() {
               alt="Ilustração de análise de inventário"
               className="w-16 shrink-0 select-none sm:w-20 lg:w-24"
             />
-            <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">
-              📦 Inventory Control
+            <h1 className="mt-2 font-display text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">
+              Controle de Estoque
             </h1>
           </div>
           <p className="mt-4 text-base font-normal text-foreground">
