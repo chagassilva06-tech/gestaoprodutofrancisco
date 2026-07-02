@@ -283,6 +283,9 @@ function Index() {
           By Francisco Chagas — todos os direitos reservados 2026
         </p>
       </div>
+      </div>
+
+
 
       {emailDuplicado && (
         <div
