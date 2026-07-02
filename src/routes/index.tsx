@@ -38,6 +38,8 @@ function Index() {
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
   const [emailDuplicado, setEmailDuplicado] = useState(false);
+  const [qrAberto, setQrAberto] = useState(false);
+  const appUrl = "https://gestaoprodutofrancisco.lovable.app/";
 
   useEffect(() => {
     if (!loading && session) navigate({ to: "/estoque" });
