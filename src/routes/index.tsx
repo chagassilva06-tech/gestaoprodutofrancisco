@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import authBg from "@/assets/auth-bg.png.asset.json";
+import authCorner from "@/assets/auth-corner.png.asset.json";
 
 export const Route = createFileRoute("/")({
   ssr: false,
