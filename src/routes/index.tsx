@@ -152,6 +152,12 @@ function Index() {
       />
       {/* Camada escura para manter o auto-relevo e a legibilidade sobre a imagem verde */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-background/85 via-background/75 to-background/90 backdrop-blur-[1px]" />
+      {/* Ilustração no canto superior, ao lado do card de login (telas largas) */}
+      <img
+        src={authCorner.url}
+        alt="Ilustração de análise de inventário"
+        className="pointer-events-none absolute right-6 top-6 z-10 hidden w-44 select-none xl:block xl:w-56 2xl:w-64"
+      />
       {/* Área de conteúdo: é a única que rola quando o cartão é maior que a tela */}
       <div className="relative z-10 flex h-full items-center justify-center overflow-y-auto px-4 py-12">
         <div className="w-full max-w-[30.5rem]">
