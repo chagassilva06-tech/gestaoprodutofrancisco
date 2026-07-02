@@ -4,6 +4,7 @@ import { Mail, Lock, Eye, EyeOff, ArrowRight, UserPlus, KeyRound, AlertTriangle 
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import authBg from "@/assets/auth-bg.png.asset.json";
 
 export const Route = createFileRoute("/")({
   ssr: false,
