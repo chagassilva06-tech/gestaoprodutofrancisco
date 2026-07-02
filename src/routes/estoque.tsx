@@ -437,11 +437,16 @@ function Estoque() {
         </div>
 
         <header className="relative mb-8 text-center">
-          <img
-            src={inventoryLogo.url}
-            alt="Ilustração de controle de inventário"
-            className="pointer-events-none absolute left-0 top-0 hidden w-20 select-none md:block lg:w-24 xl:w-32"
-          />
+          <div className="pointer-events-none absolute left-0 top-0 hidden select-none md:block">
+            <img
+              src={inventoryLogo.url}
+              alt="Ilustração de controle de inventário"
+              className="w-20 lg:w-24 xl:w-32"
+            />
+            <p className="mt-2 text-center text-xs font-semibold tracking-wide text-primary">
+              fchagassilva06
+            </p>
+          </div>
           <button
             type="button"
             onClick={sair}
