@@ -477,9 +477,6 @@ function Estoque() {
               </span>
             )}
           </div>
-          <p className="mt-2 text-xs font-medium tracking-wide text-muted-foreground">
-            By Francisco Chagas
-          </p>
           <h1 className="mt-4 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
             Gestão de produtos
           </h1>
