@@ -300,7 +300,7 @@ function Index() {
         </form>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          Acesso protegido por e-mail e senha • dados salvos na nuvem
+          Acesso protegido por e-mail e senha • Dados salvos na nuvem
         </p>
         <p className="mt-2 text-center text-xs text-muted-foreground">
           By Francisco Chagas — todos os direitos reservados 2026
