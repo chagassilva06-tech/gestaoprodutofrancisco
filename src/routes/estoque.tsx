@@ -787,8 +787,17 @@ function Estoque() {
 
 
           {listaOculta ? (
-            <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-              A lista de produtos está oculta. Clique em “👁️ Voltar” para exibir novamente.
+            <div className="rounded-xl border border-dashed border-border p-8 text-center">
+              <p className="text-sm text-muted-foreground">
+                A lista de produtos está oculta.
+              </p>
+              <button
+                type="button"
+                onClick={() => setListaOculta(false)}
+                className="mt-4 inline-flex items-center justify-center gap-2 rounded-lg border border-primary bg-primary/15 px-5 py-2.5 text-sm font-semibold text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] transition hover:bg-primary/25"
+              >
+                👁️ Mostrar produtos
+              </button>
             </div>
           ) : carregando ? (
             <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
