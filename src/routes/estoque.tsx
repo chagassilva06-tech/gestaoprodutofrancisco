@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { LogOut } from "lucide-react";
+import { LogOut, ArrowRight, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -775,15 +775,33 @@ function Estoque() {
                   ? `Filtro: ${categories.find((c) => c.termo === filtroCard)?.nome ?? filtroCard}`
                   : "Todos os produtos"}
               </h2>
-              <button
-                type="button"
-                onClick={() => setListaOculta((v) => !v)}
-                title={listaOculta ? "Mostrar produtos" : "Ocultar produtos"}
-                aria-label={listaOculta ? "Mostrar produtos" : "Ocultar produtos"}
-                className="inline-flex items-center justify-center rounded-lg border border-primary/40 bg-card p-1.5 text-primary transition hover:bg-primary/10"
-              >
-                <LogOut className="h-4 w-4" />
-              </button>
+              {listaOculta ? (
+                <button
+                  type="button"
+                  onClick={() => setListaOculta(false)}
+                  title="Mostrar produtos"
+                  aria-label="Mostrar produtos"
+                  className="inline-flex items-center gap-2 rounded-full bg-green-600 py-1.5 pl-4 pr-1.5 text-sm font-semibold text-white shadow-md transition hover:bg-green-700"
+                >
+                  Mostrar
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-green-600">
+                    <ArrowRight className="h-4 w-4" />
+                  </span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setListaOculta(true)}
+                  title="Ocultar produtos"
+                  aria-label="Ocultar produtos"
+                  className="inline-flex items-center gap-2 rounded-full bg-red-600 py-1.5 pl-1.5 pr-4 text-sm font-semibold text-white shadow-md transition hover:bg-red-700"
+                >
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-red-600">
+                    <X className="h-4 w-4" />
+                  </span>
+                  Ocultar
+                </button>
+              )}
             </div>
             <span className="text-xs text-muted-foreground">{resultados.length} resultado(s)</span>
           </div>
