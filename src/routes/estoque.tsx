@@ -778,9 +778,11 @@ function Estoque() {
               <button
                 type="button"
                 onClick={() => setListaOculta((v) => !v)}
-                className="rounded-lg border border-primary/40 bg-card px-3 py-1 text-xs font-semibold text-primary transition hover:bg-primary/10"
+                title={listaOculta ? "Mostrar produtos" : "Ocultar produtos"}
+                aria-label={listaOculta ? "Mostrar produtos" : "Ocultar produtos"}
+                className="inline-flex items-center justify-center rounded-lg border border-primary/40 bg-card p-1.5 text-primary transition hover:bg-primary/10"
               >
-                {listaOculta ? "👁️ Mostrar" : "🙈 Ocultar"}
+                <LogOut className="h-4 w-4" />
               </button>
             </div>
             <span className="text-xs text-muted-foreground">{resultados.length} resultado(s)</span>
