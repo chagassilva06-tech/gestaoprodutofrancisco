@@ -779,7 +779,7 @@ function Estoque() {
                 onClick={() => setListaOculta((v) => !v)}
                 className="rounded-lg border border-primary/40 bg-card px-3 py-1 text-xs font-semibold text-primary transition hover:bg-primary/10"
               >
-                {listaOculta ? "👁️ Voltar" : "🙈 Ocultar"}
+                {listaOculta ? "👁️ Mostrar" : "🙈 Ocultar"}
               </button>
             </div>
             <span className="text-xs text-muted-foreground">{resultados.length} resultado(s)</span>
