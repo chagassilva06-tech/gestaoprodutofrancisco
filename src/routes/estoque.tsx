@@ -438,54 +438,59 @@ function Estoque() {
           </button>
         </div>
 
-        <header className="relative mb-8 text-center">
-          <div className="pointer-events-none absolute left-0 top-0 hidden select-none md:block">
-            <img
-              src={inventoryLogo.url}
-              alt="Ilustração de controle de inventário"
-              className="w-20 lg:w-24 xl:w-32"
-            />
-            <p className="mt-2 text-center text-xs font-semibold tracking-wide text-primary">
-              By Francisco Chagas
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={sair}
-            className="absolute right-0 top-0 hidden items-center justify-center gap-2 rounded-lg border border-primary/40 bg-card px-4 py-2 text-sm font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] transition hover:bg-primary/10 sm:inline-flex"
-          >
-            <LogOut className="h-4 w-4" /> Sair da conta
-          </button>
+        <header className="relative mb-8">
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-lg shadow-black/20 sm:p-8">
+            <div className="flex flex-col items-center gap-6 md:flex-row md:justify-between">
+              {/* Imagem à esquerda */}
+              <div className="shrink-0 select-none text-center">
+                <img
+                  src={inventoryLogo.url}
+                  alt="Ilustração de controle de inventário"
+                  className="mx-auto w-24 lg:w-28 xl:w-32"
+                />
+                <p className="mt-2 text-xs font-semibold tracking-wide text-primary">
+                  By Francisco Chagas
+                </p>
+              </div>
 
-
-
-
-          <div className="mx-auto mt-4 max-w-2xl rounded-2xl border border-border bg-card p-6 shadow-lg shadow-black/20 sm:p-8">
-            <div className="flex flex-wrap items-center justify-center gap-2">
-              <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-card px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-primary shadow-[0_0_18px_-6px_var(--color-primary)]">
-                <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />
-                Controle de Inventário
-              </span>
-              {user && (
-                <span className="inline-flex max-w-full items-center gap-2 rounded-full border border-success/50 bg-success/10 px-4 py-1.5 text-xs font-medium text-success shadow-[0_0_18px_-6px_var(--color-primary)]">
-                  <span className="relative flex h-2 w-2 shrink-0">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
+              {/* Conteúdo central */}
+              <div className="flex-1 text-center">
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-card px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-primary shadow-[0_0_18px_-6px_var(--color-primary)]">
+                    <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />
+                    Controle de Inventário
                   </span>
-                  <span className="truncate">
-                    {(user.user_metadata?.full_name as string) ||
-                      (user.user_metadata?.name as string) ||
-                      user.email?.split("@")[0]}
-                  </span>
-                </span>
-              )}
+                  {user && (
+                    <span className="inline-flex max-w-full items-center gap-2 rounded-full border border-success/50 bg-success/10 px-4 py-1.5 text-xs font-medium text-success shadow-[0_0_18px_-6px_var(--color-primary)]">
+                      <span className="relative flex h-2 w-2 shrink-0">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
+                      </span>
+                      <span className="truncate">
+                        {(user.user_metadata?.full_name as string) ||
+                          (user.user_metadata?.name as string) ||
+                          user.email?.split("@")[0]}
+                      </span>
+                    </span>
+                  )}
+                </div>
+                <h1 className="mt-4 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+                  Gestão de produtos
+                </h1>
+                <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
+                  Dados salvos na nuvem. Gerencie produtos, categorias e o histórico de movimentações.
+                </p>
+              </div>
+
+              {/* Botão Sair da conta à direita */}
+              <button
+                type="button"
+                onClick={sair}
+                className="hidden shrink-0 items-center justify-center gap-2 rounded-lg border border-primary/40 bg-card px-4 py-2 text-sm font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] transition hover:bg-primary/10 sm:inline-flex"
+              >
+                <LogOut className="h-4 w-4" /> Sair da conta
+              </button>
             </div>
-            <h1 className="mt-4 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-              Gestão de produtos
-            </h1>
-            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
-              Dados salvos na nuvem. Gerencie produtos, categorias e o histórico de movimentações.
-            </p>
           </div>
         </header>
 
