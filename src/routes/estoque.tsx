@@ -786,7 +786,11 @@ function Estoque() {
           </div>
 
 
-          {carregando ? (
+          {listaOculta ? (
+            <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+              A lista de produtos está oculta. Clique em “👁️ Voltar” para exibir novamente.
+            </div>
+          ) : carregando ? (
             <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
               Carregando produtos…
             </div>
