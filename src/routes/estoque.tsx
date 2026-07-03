@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -433,7 +434,7 @@ function Estoque() {
             onClick={sair}
             className="inline-flex items-center justify-center gap-2 rounded-lg border border-primary/40 bg-card px-4 py-2 text-sm font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] transition hover:bg-primary/10"
           >
-            🚪 Sair da conta
+            <LogOut className="h-4 w-4" /> Sair da conta
           </button>
         </div>
 
@@ -453,7 +454,7 @@ function Estoque() {
             onClick={sair}
             className="absolute right-0 top-0 hidden items-center justify-center gap-2 rounded-lg border border-primary/40 bg-card px-4 py-2 text-sm font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] transition hover:bg-primary/10 sm:inline-flex"
           >
-            🚪 Sair da conta
+            <LogOut className="h-4 w-4" /> Sair da conta
           </button>
 
 
