@@ -76,6 +76,7 @@ function Estoque() {
   const [filtroRepor, setFiltroRepor] = useState<"repor" | "ok" | null>(null);
   const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
   const [reposicoes, setReposicoes] = useState<Record<string, string>>({});
+  const [listaOculta, setListaOculta] = useState(false);
 
   const [productModal, setProductModal] = useState<{ open: boolean; product: Product | null }>({
     open: false,
