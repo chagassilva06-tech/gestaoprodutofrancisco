@@ -734,16 +734,57 @@ function Estoque() {
           </button>
         </div>
 
+        {/* Card informativo: Curva ABC e boas práticas de gestão */}
+        <section className="mb-8 rounded-2xl border border-primary/30 bg-card p-5 shadow-[0_0_24px_-10px_var(--color-primary)] sm:p-6">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">📊</span>
+            <h2 className="font-display text-lg font-semibold">Curva ABC</h2>
+          </div>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            Classificação dos produtos conforme a importância financeira
+            (<strong className="text-foreground">A</strong> = maior valor/giro,{" "}
+            <strong className="text-foreground">C</strong> = menor).
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div className="rounded-xl border border-border bg-background p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                <span>🔢</span> SKUs
+              </div>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                Quantos SKUs (itens diferentes) você precisa gerenciar.
+              </p>
+            </div>
+            <div className="rounded-xl border border-border bg-background p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                <span>🗄️</span> Organização da armazenagem
+              </div>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                Cuida do espaço físico ou virtual onde os itens ficam guardados.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Lista */}
         <section className="rounded-2xl border border-border bg-card p-4 shadow-lg shadow-black/20 sm:p-6">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-display text-lg font-semibold">
-              {filtroCard
-                ? `Filtro: ${categories.find((c) => c.termo === filtroCard)?.nome ?? filtroCard}`
-                : "Todos os produtos"}
-            </h2>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <h2 className="font-display text-lg font-semibold">
+                {filtroCard
+                  ? `Filtro: ${categories.find((c) => c.termo === filtroCard)?.nome ?? filtroCard}`
+                  : "Todos os produtos"}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setListaOculta((v) => !v)}
+                className="rounded-lg border border-primary/40 bg-card px-3 py-1 text-xs font-semibold text-primary transition hover:bg-primary/10"
+              >
+                {listaOculta ? "👁️ Voltar" : "🙈 Ocultar"}
+              </button>
+            </div>
             <span className="text-xs text-muted-foreground">{resultados.length} resultado(s)</span>
           </div>
+
 
           {carregando ? (
             <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
