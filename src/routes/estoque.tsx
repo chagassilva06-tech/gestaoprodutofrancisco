@@ -670,10 +670,10 @@ function Estoque() {
                   key={c.id}
                   type="button"
                   onClick={() => setFiltroCard(ativo ? null : c.termo)}
-                  className={`group flex h-full flex-col rounded-xl border p-4 text-left transition-all duration-300 hover:-translate-y-1 ${
+                  className={`group flex h-full flex-col rounded-xl border p-4 text-left transition-colors duration-300 ${
                     ativo
                       ? "border-primary bg-primary/10 shadow-[0_0_24px_-2px_var(--color-primary),inset_0_0_0_1px_var(--color-primary)]"
-                      : "border-primary/30 bg-card shadow-[0_0_18px_-6px_var(--color-primary)] hover:border-primary/60 hover:bg-primary/5"
+                      : "border-primary/30 bg-card shadow-[0_0_18px_-6px_var(--color-primary)] hover:bg-primary/5"
                   }`}
                 >
                   <div className="text-2xl">{c.icon}</div>
@@ -852,10 +852,10 @@ function Estoque() {
                 return (
                   <li
                     key={p.id}
-                    className={`rounded-xl border bg-background p-4 transition-all duration-300 ${
+                    className={`rounded-xl border bg-background p-4 transition-colors duration-300 ${
                       baixo
                         ? "border-red-700/60 shadow-[0_0_24px_-2px_rgba(153,27,27,0.85)]"
-                        : "border-primary/20 hover:border-primary/50"
+                        : "border-primary/20"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
