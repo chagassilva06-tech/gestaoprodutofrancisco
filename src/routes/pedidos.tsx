@@ -32,10 +32,12 @@ function Pedidos() {
     setLoading(true);
     const { data, error } = await supabase
       .from("products")
-      .select("*")
-      .lt("quantidade", supabase.raw("minimo"));
+      .select("*");
     
-    if (error) {
+    if (!error && data) {
+      const criticos = (data as Product[]).filter(p => p.quantidade < p.minimo);
+      setProducts(ordenarPorCodigo(criticos));
+    } else if (error) {
       toast.error("Erro ao carregar itens para pedido.");
     } else {
       setProducts(ordenarPorCodigo((data as Product[]) ?? []));
