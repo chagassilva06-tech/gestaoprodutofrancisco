@@ -57,7 +57,7 @@
 
 :root {
   --radius: 1rem;
-  --background: oklch(0.08 0.01 240); /* Deeper, cooler background */
+  --background: oklch(0.12 0.01 240); /* Slightly softer/lighter background for luxury feel */
   --foreground: oklch(0.98 0.005 240);
   --card: oklch(0.12 0.015 240 / 0.4); /* Glass base */
   --card-foreground: oklch(0.98 0.005 240);
@@ -109,6 +109,7 @@
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
   }
+}
 
 @layer utilities {
   .premium-glow {
