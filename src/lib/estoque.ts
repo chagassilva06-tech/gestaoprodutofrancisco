@@ -59,6 +59,14 @@ export const CATEGORIAS_EXEMPLO: Omit<Category, "id">[] = [
   { nome: "Palhetas", icon: "🧹", termo: "palheta" },
 ];
 
+export const ordenarPorCodigo = (lista: Product[]) =>
+  [...lista].sort((a, b) =>
+    (a.codigo || "").localeCompare(b.codigo || "", undefined, {
+      numeric: true,
+      sensitivity: "base",
+    }),
+  );
+
 export const ACAO_LABEL: Record<string, string> = {
   entrada: "Entrada",
   saida: "Saída",

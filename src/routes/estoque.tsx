@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { LogOut, ArrowRight, X } from "lucide-react";
+import { LogOut, ArrowRight, X, LayoutDashboard, ShoppingCart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -10,6 +10,7 @@ import {
   type Category,
   type Movement,
   type Product,
+  ordenarPorCodigo,
 } from "@/lib/estoque";
 import { exportarCSV, exportarPDF } from "@/lib/export-estoque";
 import type { ProductFormData } from "@/components/estoque/ProductFormModal";
@@ -53,13 +54,6 @@ type Confirmacao = {
   onConfirm: () => void;
 };
 
-const ordenarPorCodigo = (lista: Product[]) =>
-  [...lista].sort((a, b) =>
-    (a.codigo || "").localeCompare(b.codigo || "", undefined, {
-      numeric: true,
-      sensitivity: "base",
-    }),
-  );
 
 
 
@@ -426,8 +420,47 @@ function Estoque() {
     "flex items-center justify-center text-center rounded-xl border px-5 py-3 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5";
 
   return (
-    <div className="min-h-screen bg-background px-4 py-10 sm:py-16">
-      <div className="mx-auto w-full max-w-4xl">
+    <div className="flex min-h-screen bg-background">
+      {/* Menu Lateral (Sidebar Desktop) */}
+      <aside className="hidden w-64 flex-col border-r border-border bg-card/50 backdrop-blur-md md:flex">
+        <div className="flex h-20 items-center justify-center border-b border-border px-6">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />
+            <h2 className="font-display font-bold tracking-tight text-foreground">Inventory Menu</h2>
+          </div>
+        </div>
+        <nav className="flex-1 space-y-2 p-4">
+          <button
+            onClick={() => setFiltroRepor(null)}
+            className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
+              !filtroRepor ? "bg-primary/10 text-primary shadow-[0_0_15px_-5px_var(--color-primary)]" : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+            }`}
+          >
+            <LayoutDashboard className="h-4 w-4" />
+            Visão Geral
+          </button>
+          <button
+            onClick={() => navigate({ to: "/pedidos" })}
+            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground"
+          >
+            <ShoppingCart className="h-4 w-4" />
+            Pedidos
+          </button>
+        </nav>
+        <div className="border-t border-border p-4">
+          <button
+            onClick={sair}
+            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-red-400 transition-all hover:bg-red-950/20"
+          >
+            <LogOut className="h-4 w-4" />
+            Sair
+          </button>
+        </div>
+      </aside>
+
+      {/* Conteúdo Principal */}
+      <main className="flex-1 px-4 py-10 sm:py-16 overflow-y-auto">
+        <div className="mx-auto w-full max-w-4xl">
         <div className="mb-4 flex justify-end">
           {/* O botão "Sair" ficava aqui, mas foi movido para o rodapé */}
         </div>
@@ -489,7 +522,13 @@ function Estoque() {
 
 
         {/* Alerta / contador */}
-        <div className="mt-10 mb-6 flex justify-end">
+        <div className="mt-10 mb-6 flex flex-wrap items-center justify-between gap-4">
+          <button
+            onClick={() => navigate({ to: "/pedidos" })}
+            className="inline-flex items-center gap-2 rounded-lg border border-red-700/60 bg-red-950/30 px-3 py-1.5 text-xs font-semibold text-red-200 shadow-[0_0_24px_-6px_rgba(153,27,27,0.85)] transition hover:bg-red-900/40"
+          >
+            <ShoppingCart className="h-3.5 w-3.5" /> Acessar Pedidos
+          </button>
           <div
             className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-semibold ${
               itensAbaixo > 0
@@ -1005,6 +1044,7 @@ function Estoque() {
           onCancel={() => setConfirm((c) => ({ ...c, open: false }))}
         />
       </Suspense>
+      </main>
     </div>
   );
 }
