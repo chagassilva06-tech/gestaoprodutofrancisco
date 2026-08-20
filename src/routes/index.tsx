@@ -59,13 +59,13 @@ function Index() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--color-primary)_0%,_transparent_70%)] opacity-10" />
       
       <div className="relative w-full max-w-[32rem] p-10 glass-card rounded-[2.5rem] shadow-2xl transition-all hover:shadow-[0_0_40px_-10px_var(--color-primary)] animate-scale-in">
-        <header className="mb-10 text-center">
-          <img src={authCorner.url} className="mx-auto w-20 mb-6 drop-shadow-lg" alt="Logo" />
-          <h1 className="text-4xl font-extrabold tracking-tight text-white mb-3">
-            📦 Inventory <span className="text-primary">Control</span>
+        <header className="mb-12 text-center">
+          <img src={authCorner.url} className="mx-auto w-24 mb-8 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:scale-105 transition-transform duration-500" alt="Logo" />
+          <h1 className="text-4xl font-black tracking-tighter text-white mb-3">
+            📦 INVENTORY <span className="text-primary text-glow">CONTROL</span>
           </h1>
-          <p className="text-base text-muted-foreground/80 leading-relaxed max-w-xs mx-auto">
-            Performance Experience™ — Entre com sua conta para gerenciar seu estoque.
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground/60 max-w-xs mx-auto">
+            Performance Experience™
           </p>
         </header>
 
@@ -76,7 +76,7 @@ function Index() {
               <input
                 type="email"
                 placeholder="E-mail profissional"
-                className="w-full bg-card/50 border border-border rounded-xl py-3 pl-11 pr-4 focus:ring-2 focus:ring-primary outline-none transition-all"
+                className="w-full bg-card/20 border border-white/5 rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-primary/40 focus:border-primary/50 outline-none transition-all shadow-inner text-white placeholder:text-muted-foreground/30 font-medium"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -86,7 +86,7 @@ function Index() {
               <input
                 type={show ? "text" : "password"}
                 placeholder="Senha de acesso"
-                className="w-full bg-card/50 border border-border rounded-xl py-3 pl-11 pr-12 focus:ring-2 focus:ring-primary outline-none transition-all"
+                className="w-full bg-card/20 border border-white/5 rounded-2xl py-4 pl-12 pr-12 focus:ring-2 focus:ring-primary/40 focus:border-primary/50 outline-none transition-all shadow-inner text-white placeholder:text-muted-foreground/30 font-medium"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
