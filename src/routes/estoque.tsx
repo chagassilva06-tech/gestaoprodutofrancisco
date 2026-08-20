@@ -263,10 +263,10 @@ function Estoque() {
       <aside className={`fixed inset-y-0 left-0 z-40 transition-all duration-500 ease-in-out border-r border-white/5 bg-card/80 backdrop-blur-xl ${sidebarAberta ? 'w-64' : 'w-20'} hidden md:flex flex-col`}>
         <div className="h-20 flex items-center px-6 border-b border-white/5">
           <div className="flex items-center gap-3 overflow-hidden whitespace-nowrap">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-success flex items-center justify-center shadow-lg shadow-primary/20 shrink-0 border border-white/10 group-hover:premium-glow transition-all">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-success flex items-center justify-center shadow-lg shadow-primary/30 shrink-0 border border-white/10 group-hover:premium-glow transition-all">
               <div className="relative">
                 <LayoutDashboard className="h-6 w-6 text-primary-foreground" />
-                <div className="absolute -top-1 -right-1 h-2 w-2 bg-white rounded-full animate-pulse shadow-sm" />
+                <div className="absolute -top-1 -right-1 h-2 w-2 bg-white rounded-full animate-pulse shadow-[0_0_8px_white]" />
               </div>
             </div>
             <div className={`flex flex-col transition-opacity duration-300 ${sidebarAberta ? 'opacity-100' : 'opacity-0'}`}>
@@ -338,13 +338,13 @@ function Estoque() {
               { label: 'Unidades em Stock', value: stats.unidades, icon: LayoutDashboard, color: 'primary' },
               { label: 'Eficiência de Stock', value: `${stats.percentual}%`, icon: CheckCircle2, color: 'success' },
             ].map((stat, i) => (
-              <div key={i} className="glass-card p-6 rounded-2xl border border-white/5 hover:border-primary/20 transition-all group">
+              <div key={i} className="glass-card p-6 rounded-[1.5rem] border border-white/5 hover:border-primary/30 transition-all group hover:premium-glow">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1 uppercase tracking-widest">{stat.label}</p>
-                    <h3 className="text-2xl font-bold tracking-tight">{stat.value}</h3>
+                    <p className="text-[10px] font-bold text-muted-foreground mb-1 uppercase tracking-widest opacity-60">{stat.label}</p>
+                    <h3 className="text-2xl font-black tracking-tight text-white">{stat.value}</h3>
                   </div>
-                  <div className={`p-2 rounded-lg bg-${stat.color}/10 text-${stat.color} group-hover:scale-110 transition-transform`}>
+                  <div className={`p-2.5 rounded-xl bg-${stat.color}/10 text-${stat.color} group-hover:scale-110 transition-transform`}>
                     <stat.icon className="h-5 w-5" />
                   </div>
                 </div>
@@ -358,7 +358,7 @@ function Estoque() {
               <input
                 type="text"
                 placeholder="Pesquisar por Código, Produto ou Fabricante..."
-                className="w-full bg-card/50 border border-white/5 rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all shadow-inner text-base font-medium placeholder:text-muted-foreground/40"
+                className="w-full bg-card/30 border border-white/5 rounded-2xl py-5 pl-14 pr-4 focus:ring-2 focus:ring-primary/40 focus:border-primary/50 outline-none transition-all shadow-inner text-base font-medium placeholder:text-muted-foreground/30"
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
                 aria-label="Pesquisar no inventário"
