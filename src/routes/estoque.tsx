@@ -285,10 +285,10 @@ function Estoque() {
             <button
               key={item.id}
               onClick={item.onClick}
-              className={`flex items-center gap-4 w-full p-3 rounded-xl transition-all duration-300 group ${item.active ? 'bg-primary/10 text-primary shadow-sm shadow-primary/10' : 'text-muted-foreground hover:bg-white/5 hover:text-white'}`}
+              className={`flex items-center gap-4 w-full p-3 rounded-xl transition-all duration-300 group outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${item.active ? 'bg-primary/10 text-primary shadow-sm shadow-primary/10' : 'text-muted-foreground hover:bg-white/5 hover:text-white'}`}
             >
-              <item.icon className={`h-5 w-5 shrink-0 ${item.active ? 'text-primary' : 'group-hover:scale-110 transition-transform'}`} />
-              <span className={`font-medium transition-opacity duration-300 ${sidebarAberta ? 'opacity-100' : 'opacity-0'}`}>{item.label}</span>
+              <item.icon className={`h-5 w-5 shrink-0 ${item.active ? 'text-primary' : 'group-hover:scale-110 group-hover:text-primary transition-all duration-300'}`} />
+              <span className={`font-semibold tracking-tight transition-opacity duration-300 ${sidebarAberta ? 'opacity-100' : 'opacity-0'}`}>{item.label}</span>
             </button>
           ))}
         </nav>
@@ -354,13 +354,14 @@ function Estoque() {
 
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 relative group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors pointer-events-none" />
               <input
                 type="text"
                 placeholder="Pesquisar por Código, Produto ou Fabricante..."
-                className="w-full bg-card/50 border border-white/5 rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all shadow-inner"
+                className="w-full bg-card/50 border border-white/5 rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all shadow-inner text-base font-medium placeholder:text-muted-foreground/40"
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
+                aria-label="Pesquisar no inventário"
               />
             </div>
             <div className="flex gap-2">

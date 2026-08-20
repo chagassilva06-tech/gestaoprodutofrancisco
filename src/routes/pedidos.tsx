@@ -191,7 +191,8 @@ function Pedidos() {
                       <div className="shrink-0">
                          <button 
                           onClick={() => navigate({ to: "/estoque", search: { busca: p.codigo } })}
-                          className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-all text-muted-foreground hover:text-white"
+                          className="p-3 bg-white/5 hover:bg-primary/20 hover:text-primary rounded-xl transition-all text-muted-foreground active:scale-90"
+                          title={`Ver ${p.produto} no estoque`}
                          >
                            <ChevronRight className="h-5 w-5" />
                          </button>
