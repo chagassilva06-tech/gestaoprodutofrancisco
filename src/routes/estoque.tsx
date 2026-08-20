@@ -428,13 +428,13 @@ function Estoque() {
   return (
     <div className="min-h-screen bg-background px-4 py-10 sm:py-16">
       <div className="mx-auto w-full max-w-4xl">
-        <div className="mb-4 flex justify-end sm:hidden">
+        <div className="mb-4 flex justify-end">
           <button
             type="button"
             onClick={sair}
             className="inline-flex items-center justify-center gap-2 rounded-lg border border-primary/40 bg-card px-4 py-2 text-sm font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] transition hover:bg-primary/10"
           >
-            <LogOut className="h-4 w-4" /> Sair da conta
+            <LogOut className="h-4 w-4" /> Sair
           </button>
         </div>
 
@@ -482,14 +482,6 @@ function Estoque() {
                 </p>
               </div>
 
-              {/* Botão Sair da conta à direita */}
-              <button
-                type="button"
-                onClick={sair}
-                className="hidden shrink-0 items-center justify-center gap-2 rounded-lg border border-primary/40 bg-card px-4 py-2 text-sm font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] transition hover:bg-primary/10 sm:inline-flex"
-              >
-                <LogOut className="h-4 w-4" /> Sair da conta
-              </button>
             </div>
           </div>
         </header>
