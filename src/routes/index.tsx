@@ -148,13 +148,10 @@ function Index() {
 
   return (
     <div className="fixed inset-0 bg-background">
-      {/* Fundo fixo: nunca se move ao rolar ou alternar entre Entrar e Criar conta */}
-      <div
-        className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url("${authBg.url}")` }}
-      />
-      {/* Camada escura para manter o auto-relevo e a legibilidade sobre a imagem verde */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-background/85 via-background/75 to-background/90 backdrop-blur-[1px]" />
+      {/* Fundo em degradê suave, discreto e moderno */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,var(--color-primary)_0%,transparent_35%),radial-gradient(circle_at_bottom_left,var(--color-success)_0%,transparent_35%)] opacity-[0.08]" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background via-background/95 to-background" />
+      {/* Área de conteúdo: é a única que rola quando o cartão é maior que a tela */}
       {/* Área de conteúdo: é a única que rola quando o cartão é maior que a tela */}
       <div className="relative z-10 flex h-full items-center justify-center overflow-y-auto px-4 py-12">
         <div className="w-full max-w-[30.5rem]">
