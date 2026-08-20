@@ -475,7 +475,7 @@ function Estoque() {
         {confirm.open && (
           <ConfirmModal
             open={confirm.open}
-            onClose={() => setConfirm(prev => ({ ...prev, open: false }))}
+            onCancel={() => setConfirm(prev => ({ ...prev, open: false }))}
             onConfirm={confirm.onConfirm}
             title={confirm.title}
             description={confirm.description}
@@ -489,7 +489,6 @@ function Estoque() {
             onClose={() => setProductModal({ open: false, product: null })}
             onSave={salvarProduto}
             product={productModal.product}
-            categories={categories}
           />
         )}
         {categoryOpen && (
