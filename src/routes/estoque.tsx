@@ -53,13 +53,6 @@ type Confirmacao = {
   onConfirm: () => void;
 };
 
-const ordenarPorCodigo = (lista: Product[]) =>
-  [...lista].sort((a, b) =>
-    (a.codigo || "").localeCompare(b.codigo || "", undefined, {
-      numeric: true,
-      sensitivity: "base",
-    }),
-  );
 
 
 
