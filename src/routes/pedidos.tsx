@@ -135,7 +135,7 @@ function Pedidos() {
           <input
             type="text"
             placeholder="Filtrar por produto, código ou fabricante..."
-            className="w-full bg-card/50 border border-white/5 rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all"
+            className="w-full bg-card/30 border border-white/5 rounded-2xl py-5 pl-14 pr-4 focus:ring-2 focus:ring-primary/40 focus:border-primary/50 outline-none transition-all shadow-inner text-base font-medium placeholder:text-muted-foreground/30"
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
           />
