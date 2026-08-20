@@ -10,6 +10,7 @@ import {
   type Category,
   type Movement,
   type Product,
+  ordenarPorCodigo,
 } from "@/lib/estoque";
 import { exportarCSV, exportarPDF } from "@/lib/export-estoque";
 import type { ProductFormData } from "@/components/estoque/ProductFormModal";
