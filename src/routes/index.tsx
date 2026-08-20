@@ -61,8 +61,12 @@ function Index() {
       <div className="relative w-full max-w-[32rem] p-8 glass-card rounded-3xl border border-white/10 shadow-2xl transition-all hover:shadow-[0_0_30px_-5px_var(--color-primary)] animate-scale-in">
         <header className="mb-10 text-center">
           <img src={authCorner.url} className="mx-auto w-20 mb-6 drop-shadow-lg" alt="Logo" />
-          <h1 className="text-3xl font-bold tracking-tight text-white mb-2">📦 Inventory Control</h1>
-          <p className="text-muted-foreground">Performance Experience™ — Entre com sua conta</p>
+          <h1 className="text-4xl font-extrabold tracking-tight text-white mb-3">
+            📦 Inventory <span className="text-primary">Control</span>
+          </h1>
+          <p className="text-base text-muted-foreground/80 leading-relaxed max-w-xs mx-auto">
+            Performance Experience™ — Entre com sua conta para gerenciar seu estoque.
+          </p>
         </header>
 
         <form onSubmit={handleSubmit} className="space-y-6">

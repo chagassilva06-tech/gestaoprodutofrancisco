@@ -78,7 +78,7 @@ function Pedidos() {
           
           <div className="flex items-center gap-3 pr-4 border-r border-white/5">
             <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-primary to-success flex items-center justify-center shadow-md shadow-primary/20 shrink-0 border border-white/10">
-              <Package className="h-5 w-5 text-primary-foreground" />
+              <ShoppingCart className="h-5 w-5 text-primary-foreground" />
             </div>
             <div className="flex flex-col">
               <span className="font-display font-black text-sm tracking-tighter text-white">INVENTORY</span>
@@ -91,8 +91,8 @@ function Pedidos() {
               <ShoppingCart className="h-5 w-5" />
             </div>
             <div className="flex flex-col">
-              <h1 className="text-sm font-bold tracking-tight">Módulo de Pedidos</h1>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Itens Críticos</p>
+              <h1 className="text-base font-bold tracking-tight leading-none mb-1">Módulo de Pedidos</h1>
+              <p className="text-[10px] text-destructive/80 font-bold uppercase tracking-widest">Protocolo de Reposição Crítica</p>
             </div>
           </div>
         </div>

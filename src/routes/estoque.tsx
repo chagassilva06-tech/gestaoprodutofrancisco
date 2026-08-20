@@ -265,8 +265,8 @@ function Estoque() {
           <div className="flex items-center gap-3 overflow-hidden whitespace-nowrap">
             <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-success flex items-center justify-center shadow-lg shadow-primary/20 shrink-0 border border-white/10 group-hover:premium-glow transition-all">
               <div className="relative">
-                <Package className="h-6 w-6 text-primary-foreground" />
-                <div className="absolute -top-1 -right-1 h-2.5 w-2.5 bg-white rounded-full animate-pulse shadow-sm" />
+                <LayoutDashboard className="h-6 w-6 text-primary-foreground" />
+                <div className="absolute -top-1 -right-1 h-2 w-2 bg-white rounded-full animate-pulse shadow-sm" />
               </div>
             </div>
             <div className={`flex flex-col transition-opacity duration-300 ${sidebarAberta ? 'opacity-100' : 'opacity-0'}`}>
@@ -308,8 +308,8 @@ function Estoque() {
               <Menu className="h-5 w-5" />
             </button>
             <div className="flex flex-col">
-              <h1 className="text-lg font-bold tracking-tight">Gestão de Performance</h1>
-              <p className="text-xs text-muted-foreground">Sistema em tempo real — Cloud Sync</p>
+              <h1 className="text-xl font-bold tracking-tight leading-none mb-1">Gestão de Performance</h1>
+              <p className="text-xs font-medium text-muted-foreground/70 uppercase tracking-widest">Live Cloud Data Sourcing</p>
             </div>
           </div>
 
