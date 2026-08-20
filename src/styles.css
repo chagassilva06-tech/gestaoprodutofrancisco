@@ -112,17 +112,17 @@
 
 @layer utilities {
   .premium-glow {
-    box-shadow: 0 0 15px -3px var(--color-primary), 0 0 6px -2px var(--color-primary);
+    box-shadow: 0 0 20px -5px var(--color-primary);
   }
   
   .glass-card {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--card);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
   }
 
   .text-glow {
-    text-shadow: 0 0 8px var(--color-primary);
+    text-shadow: 0 0 10px var(--color-primary);
   }
 }
 
