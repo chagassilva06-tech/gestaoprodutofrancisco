@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { LogOut, ArrowRight, X, LayoutDashboard, ShoppingCart, Search, Plus, History, FileText, Package, CheckCircle2, AlertCircle, ChevronRight, Menu, Bell } from "lucide-react";
+import { LogOut, LayoutDashboard, ShoppingCart, Search, Plus, History, FileText, Package, CheckCircle2, AlertCircle, ChevronRight, Menu, Bell } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -61,9 +61,7 @@ function Estoque() {
   const [busca, setBusca] = useState("");
   const [filtroCard, setFiltroCard] = useState<string | null>(null);
   const [filtroRepor, setFiltroRepor] = useState<"repor" | "ok" | null>(null);
-  const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
   const [reposicoes, setReposicoes] = useState<Record<string, string>>({});
-  const [listaOculta, setListaOculta] = useState(false);
   const [sidebarAberta, setSidebarAberta] = useState(true);
 
   const [productModal, setProductModal] = useState<{ open: boolean; product: Product | null }>({
@@ -165,6 +163,63 @@ function Estoque() {
     const nova = Math.max(0, Math.min(product.minimo, product.quantidade + sinal * valor));
     aplicarQuantidade(product, nova, sinal > 0 ? "entrada" : "saida");
     setReposicoes((prev) => ({ ...prev, [product.id]: "" }));
+  };
+
+  const salvarProduto = async (form: ProductFormData) => {
+    if (!user) return;
+    const editando = productModal.product;
+    if (editando) {
+      const { error } = await supabase.from("products").update(form).eq("id", editando.id);
+      if (error) {
+        toast.error("Erro ao salvar o produto.");
+        return;
+      }
+      setProducts((prev) =>
+        ordenarPorCodigo(prev.map((p) => (p.id === editando.id ? { ...p, ...form } : p))),
+      );
+      toast.success("Produto atualizado.");
+    } else {
+      const { data, error } = await supabase
+        .from("products")
+        .insert({ ...form, user_id: user.id })
+        .select()
+        .single();
+      if (error || !data) {
+        toast.error("Erro ao criar o produto.");
+        return;
+      }
+      setProducts((prev) => ordenarPorCodigo([...prev, data as Product]));
+      toast.success("Produto criado.");
+    }
+    setProductModal({ open: false, product: null });
+  };
+
+  const adicionarCategoria = async (nome: string, icon: string, termo: string) => {
+    if (!user) return;
+    const { data, error } = await supabase
+      .from("categories")
+      .insert({ user_id: user.id, nome, icon, termo })
+      .select()
+      .single();
+    if (error) {
+      toast.error("Erro ao criar categoria.");
+      return;
+    }
+    setCategories((prev) => [...prev, data as Category].sort((a, b) => a.nome.localeCompare(b.nome)));
+    toast.success("Categoria adicionada.");
+  };
+
+  const excluirCategoria = (cat: Category) => {
+    setConfirm({
+      open: true,
+      title: `Excluir categoria "${cat.nome}"?`,
+      onConfirm: async () => {
+        setConfirm((c) => ({ ...c, open: false }));
+        await supabase.from("categories").delete().eq("id", cat.id);
+        setCategories((prev) => prev.filter((c) => c.id !== cat.id));
+        toast.success("Categoria excluída.");
+      },
+    });
   };
 
   const sair = async () => {
@@ -275,7 +330,6 @@ function Estoque() {
         </header>
 
         <div className="p-6 md:p-10 space-y-8 animate-fade-in">
-          {/* Metrics Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { label: 'Total de SKUs', value: stats.total, icon: Package, color: 'primary' },
@@ -297,13 +351,12 @@ function Estoque() {
             ))}
           </div>
 
-          {/* Quick Actions & Search */}
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 relative group">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <input
                 type="text"
-                placeholder="Pesquisar por Código, Produto ou Fabricante... (Ctrl + K)"
+                placeholder="Pesquisar por Código, Produto ou Fabricante..."
                 className="w-full bg-card/50 border border-white/5 rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all shadow-inner"
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
@@ -326,7 +379,6 @@ function Estoque() {
             </div>
           </div>
 
-          {/* Products Table Section */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold flex items-center gap-2">
@@ -335,8 +387,8 @@ function Estoque() {
                 <span className="ml-2 px-2 py-0.5 rounded-md bg-white/5 text-xs text-muted-foreground">{resultados.length} resultados</span>
               </h2>
               <div className="flex items-center gap-2 text-xs">
-                <button onClick={() => exportarPDF(resultados)} className="px-3 py-1.5 hover:bg-white/5 rounded-lg border border-white/5 transition-colors">PDF</button>
-                <button onClick={() => exportarCSV(resultados)} className="px-3 py-1.5 hover:bg-white/5 rounded-lg border border-white/5 transition-colors">CSV</button>
+                <button onClick={() => exportarPDF(resultados, filtroRepor === 'repor')} className="px-3 py-1.5 hover:bg-white/5 rounded-lg border border-white/5 transition-colors">PDF</button>
+                <button onClick={() => exportarCSV(resultados, filtroRepor === 'repor')} className="px-3 py-1.5 hover:bg-white/5 rounded-lg border border-white/5 transition-colors">CSV</button>
               </div>
             </div>
 
@@ -410,23 +462,19 @@ function Estoque() {
         </div>
 
         <footer className="p-10 border-t border-white/5 text-center space-y-4">
-          <div className="flex justify-center items-center gap-2">
-             <div className="h-8 w-8 rounded bg-primary/10 flex items-center justify-center">
-                <Package className="h-4 w-4 text-primary" />
-             </div>
-             <span className="font-display font-bold text-sm tracking-tighter">PERFORMANCE EXPERIENCE™</span>
-          </div>
+          <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed uppercase tracking-widest font-bold">
+             PERFORMANCE EXPERIENCE™
+          </p>
           <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
             By Francisco Chagas. Engenharia de Gestão de Inventário de Alta Precisão. © 2026 Todos os direitos reservados.
           </p>
         </footer>
       </main>
 
-      {/* Modais Suspense */}
       <Suspense>
         {confirm.open && (
           <ConfirmModal
-            isOpen={confirm.open}
+            open={confirm.open}
             onClose={() => setConfirm(prev => ({ ...prev, open: false }))}
             onConfirm={confirm.onConfirm}
             title={confirm.title}
@@ -437,7 +485,7 @@ function Estoque() {
         )}
         {productModal.open && (
           <ProductFormModal
-            isOpen={productModal.open}
+            open={productModal.open}
             onClose={() => setProductModal({ open: false, product: null })}
             onSave={salvarProduto}
             product={productModal.product}
@@ -446,7 +494,7 @@ function Estoque() {
         )}
         {categoryOpen && (
           <CategoryModal
-            isOpen={categoryOpen}
+            open={categoryOpen}
             onClose={() => setCategoryOpen(false)}
             categories={categories}
             onAdd={adicionarCategoria}
@@ -455,7 +503,7 @@ function Estoque() {
         )}
         {historyOpen && (
           <HistoryModal
-            isOpen={historyOpen}
+            open={historyOpen}
             onClose={() => setHistoryOpen(false)}
             movements={movements}
           />
