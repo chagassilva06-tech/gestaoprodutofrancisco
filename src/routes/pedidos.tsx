@@ -75,9 +75,14 @@ function Pedidos() {
           <button onClick={() => navigate({ to: "/estoque" })} className="p-2 hover:bg-white/5 rounded-lg text-muted-foreground transition-colors group">
             <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
           </button>
-          <div className="flex flex-col">
-            <h1 className="text-lg font-bold tracking-tight">Módulo de Pedidos</h1>
-            <p className="text-xs text-muted-foreground">Itens abaixo do mínimo padronizado</p>
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-lg bg-destructive/10 border border-destructive/20 flex items-center justify-center text-destructive">
+              <ShoppingCart className="h-5 w-5" />
+            </div>
+            <div className="flex flex-col">
+              <h1 className="text-lg font-bold tracking-tight">Módulo de Pedidos</h1>
+              <p className="text-xs text-muted-foreground">Itens abaixo do mínimo padronizado</p>
+            </div>
           </div>
         </div>
 
