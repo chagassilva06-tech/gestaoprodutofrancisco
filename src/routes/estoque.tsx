@@ -338,13 +338,13 @@ function Estoque() {
               { label: 'Unidades em Stock', value: stats.unidades, icon: LayoutDashboard, color: 'primary' },
               { label: 'Eficiência de Stock', value: `${stats.percentual}%`, icon: CheckCircle2, color: 'success' },
             ].map((stat, i) => (
-              <div key={i} className="glass-card p-6 rounded-2xl border border-white/5 hover:border-primary/20 transition-all group">
+              <div key={i} className="glass-card p-6 rounded-[1.5rem] border border-white/5 hover:border-primary/30 transition-all group hover:premium-glow">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1 uppercase tracking-widest">{stat.label}</p>
-                    <h3 className="text-2xl font-bold tracking-tight">{stat.value}</h3>
+                    <p className="text-[10px] font-bold text-muted-foreground mb-1 uppercase tracking-widest opacity-60">{stat.label}</p>
+                    <h3 className="text-2xl font-black tracking-tight text-white">{stat.value}</h3>
                   </div>
-                  <div className={`p-2 rounded-lg bg-${stat.color}/10 text-${stat.color} group-hover:scale-110 transition-transform`}>
+                  <div className={`p-2.5 rounded-xl bg-${stat.color}/10 text-${stat.color} group-hover:scale-110 transition-transform`}>
                     <stat.icon className="h-5 w-5" />
                   </div>
                 </div>
