@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { LogOut, LayoutDashboard, ShoppingCart, Search, AlertCircle, Package, ArrowLeft, ChevronRight, FileText } from "lucide-react";
+import { LogOut, LayoutDashboard, ShoppingCart, Search, AlertCircle, Package, ArrowLeft, ChevronRight, FileText, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { type Product, ordenarPorCodigo } from "@/lib/estoque";
