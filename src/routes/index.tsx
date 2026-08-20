@@ -58,7 +58,7 @@ function Index() {
     <div className="fixed inset-0 flex items-center justify-center bg-background p-4 animate-fade-in">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--color-primary)_0%,_transparent_70%)] opacity-10" />
       
-      <div className="relative w-full max-w-[32rem] p-8 glass-card rounded-3xl border border-white/10 shadow-2xl transition-all hover:shadow-[0_0_30px_-5px_var(--color-primary)] animate-scale-in">
+      <div className="relative w-full max-w-[32rem] p-10 glass-card rounded-[2.5rem] shadow-2xl transition-all hover:shadow-[0_0_40px_-10px_var(--color-primary)] animate-scale-in">
         <header className="mb-10 text-center">
           <img src={authCorner.url} className="mx-auto w-20 mb-6 drop-shadow-lg" alt="Logo" />
           <h1 className="text-4xl font-extrabold tracking-tight text-white mb-3">
