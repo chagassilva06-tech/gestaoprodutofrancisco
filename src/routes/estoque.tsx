@@ -1,12 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { LogOut, ArrowRight, X, LayoutDashboard, ShoppingCart } from "lucide-react";
+import { LogOut, LayoutDashboard, ShoppingCart, Search, Plus, History, FileText, Package, CheckCircle2, AlertCircle, ChevronRight, Menu, Bell } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import {
-  CATEGORIAS_EXEMPLO,
-  PRODUTOS_EXEMPLO,
   type Category,
   type Movement,
   type Product,
@@ -16,7 +14,6 @@ import { exportarCSV, exportarPDF } from "@/lib/export-estoque";
 import type { ProductFormData } from "@/components/estoque/ProductFormModal";
 import inventoryLogo from "@/assets/inventory-logo.png.asset.json";
 
-// Modais carregados sob demanda (code-splitting) para reduzir o JS inicial.
 const ConfirmModal = lazy(() =>
   import("@/components/estoque/ConfirmModal").then((m) => ({ default: m.ConfirmModal })),
 );
@@ -34,12 +31,8 @@ export const Route = createFileRoute("/estoque")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Estoque Mínimo — Controle de Inventário" },
-      {
-        name: "description",
-        content:
-          "Gerencie produtos, categorias e o histórico de movimentações com dados salvos na nuvem.",
-      },
+      { title: "Performance Dashboard | Inventory Control" },
+      { name: "description", content: "Painel de controle de alta performance para gestão de inventário." },
     ],
   }),
   component: Estoque,
@@ -54,9 +47,6 @@ type Confirmacao = {
   onConfirm: () => void;
 };
 
-
-
-
 function Estoque() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
@@ -69,9 +59,8 @@ function Estoque() {
   const [busca, setBusca] = useState("");
   const [filtroCard, setFiltroCard] = useState<string | null>(null);
   const [filtroRepor, setFiltroRepor] = useState<"repor" | "ok" | null>(null);
-  const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
   const [reposicoes, setReposicoes] = useState<Record<string, string>>({});
-  const [listaOculta, setListaOculta] = useState(false);
+  const [sidebarAberta, setSidebarAberta] = useState(true);
 
   const [productModal, setProductModal] = useState<{ open: boolean; product: Product | null }>({
     open: false,
@@ -85,7 +74,6 @@ function Estoque() {
     onConfirm: () => {},
   });
 
-  // Proteção de rota
   useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/" });
   }, [authLoading, user, navigate]);
@@ -103,7 +91,7 @@ function Estoque() {
         .limit(150),
     ]);
     if (prod.error || cat.error || mov.error) {
-      toast.error("Erro ao carregar os dados da nuvem.");
+      toast.error("Erro na sincronização com a nuvem.");
     }
     setProducts(ordenarPorCodigo((prod.data as Product[]) ?? []));
     setCategories((cat.data as Category[]) ?? []);
@@ -115,23 +103,29 @@ function Estoque() {
     if (user) carregarDados();
   }, [user, carregarDados]);
 
-  // ---- Operações de estoque ----
   const aplicarQuantidade = useCallback(
     async (product: Product, novaBruta: number, acao: string) => {
       if (!user) return;
       const nova = Math.max(0, Math.floor(novaBruta));
       const anterior = product.quantidade;
+      
+      setProducts((prev) =>
+        prev.map((p) => (p.id === product.id ? { ...p, quantidade: nova } : p)),
+      );
+
       const { error } = await supabase
         .from("products")
         .update({ quantidade: nova })
         .eq("id", product.id);
+      
       if (error) {
-        toast.error("Não foi possível atualizar o estoque.");
+        toast.error("Falha na atualização. Revertendo...");
+        setProducts((prev) =>
+          prev.map((p) => (p.id === product.id ? { ...p, quantidade: anterior } : p)),
+        );
         return;
       }
-      setProducts((prev) =>
-        prev.map((p) => (p.id === product.id ? { ...p, quantidade: nova } : p)),
-      );
+
       const movInsert = {
         user_id: user.id,
         product_id: product.id,
@@ -142,11 +136,13 @@ function Estoque() {
         quantidade_anterior: anterior,
         quantidade_nova: nova,
       };
+      
       const { data } = await supabase
         .from("stock_movements")
         .insert(movInsert)
         .select()
         .single();
+      
       if (data) setMovements((prev) => [data as Movement, ...prev]);
     },
     [user],
@@ -155,22 +151,11 @@ function Estoque() {
   const ajustarEstoque = (product: Product, sinal: 1 | -1) => {
     const valor = Number(reposicoes[product.id]);
     if (!Number.isFinite(valor) || valor <= 0) {
-      toast.error("Informe uma quantidade válida.", { closeButton: true });
+      toast.error("Informe uma métrica válida.");
       return;
     }
     if (sinal > 0 && product.quantidade >= product.minimo) {
-      toast.error("Limite Excedido!", {
-        closeButton: true,
-        description: `O estoque já está 100% (${product.minimo} un.). Não é possível dar entrada.`,
-      });
-      return;
-    }
-    if (sinal > 0 && product.quantidade + valor > product.minimo) {
-      const restante = Math.max(0, product.minimo - product.quantidade);
-      toast.error("Quantidade acima do mínimo", {
-        closeButton: true,
-        description: `O estoque não pode ultrapassar o mínimo de ${product.minimo} un. Você pode adicionar no máximo ${restante} un.`,
-      });
+      toast.error("Capacidade Máxima Atingida");
       return;
     }
     const nova = Math.max(0, Math.min(product.minimo, product.quantidade + sinal * valor));
@@ -178,38 +163,6 @@ function Estoque() {
     setReposicoes((prev) => ({ ...prev, [product.id]: "" }));
   };
 
-  const completarMinimo = (product: Product) =>
-    aplicarQuantidade(product, product.minimo, "completar");
-
-  const completarTodos = async () => {
-    const alvos = resultados.filter((p) => p.quantidade < p.minimo);
-    if (alvos.length === 0) {
-      toast.info("Nenhum item precisa de reposição na lista atual.");
-      return;
-    }
-    for (const p of alvos) await aplicarQuantidade(p, p.minimo, "completar");
-    toast.success(`${alvos.length} item(ns) completados até o mínimo.`);
-  };
-
-  const zerarEstoque = () => {
-    setConfirm({
-      open: true,
-      title: "Zerar todo o estoque?",
-      description:
-        "A quantidade de TODOS os produtos será definida como 0. Cada alteração ficará registrada no histórico. Esta ação não pode ser desfeita.",
-      confirmLabel: "Zerar tudo",
-      danger: true,
-      onConfirm: async () => {
-        setConfirm((c) => ({ ...c, open: false }));
-        for (const p of products) {
-          if (p.quantidade !== 0) await aplicarQuantidade(p, 0, "zerar");
-        }
-        toast.success("Estoque zerado.");
-      },
-    });
-  };
-
-  // ---- CRUD de produtos ----
   const salvarProduto = async (form: ProductFormData) => {
     if (!user) return;
     const editando = productModal.product;
@@ -222,20 +175,6 @@ function Estoque() {
       setProducts((prev) =>
         ordenarPorCodigo(prev.map((p) => (p.id === editando.id ? { ...p, ...form } : p))),
       );
-      if (form.quantidade !== editando.quantidade) {
-        const mov = {
-          user_id: user.id,
-          product_id: editando.id,
-          produto_nome: form.produto,
-          codigo: form.codigo,
-          acao: "ajuste",
-          delta: form.quantidade - editando.quantidade,
-          quantidade_anterior: editando.quantidade,
-          quantidade_nova: form.quantidade,
-        };
-        const { data } = await supabase.from("stock_movements").insert(mov).select().single();
-        if (data) setMovements((prev) => [data as Movement, ...prev]);
-      }
       toast.success("Produto atualizado.");
     } else {
       const { data, error } = await supabase
@@ -247,64 +186,12 @@ function Estoque() {
         toast.error("Erro ao criar o produto.");
         return;
       }
-      const novo = data as Product;
-      setProducts((prev) => ordenarPorCodigo([...prev, novo]));
-      const mov = {
-        user_id: user.id,
-        product_id: novo.id,
-        produto_nome: novo.produto,
-        codigo: novo.codigo,
-        acao: "criar",
-        delta: novo.quantidade,
-        quantidade_anterior: 0,
-        quantidade_nova: novo.quantidade,
-      };
-      const { data: movData } = await supabase
-        .from("stock_movements")
-        .insert(mov)
-        .select()
-        .single();
-      if (movData) setMovements((prev) => [movData as Movement, ...prev]);
+      setProducts((prev) => ordenarPorCodigo([...prev, data as Product]));
       toast.success("Produto criado.");
     }
     setProductModal({ open: false, product: null });
   };
 
-  const excluirProduto = (product: Product) => {
-    setConfirm({
-      open: true,
-      title: `Excluir "${product.produto}"?`,
-      description: "O produto será removido permanentemente do estoque.",
-      confirmLabel: "Excluir",
-      danger: true,
-      onConfirm: async () => {
-        setConfirm((c) => ({ ...c, open: false }));
-        const { error } = await supabase.from("products").delete().eq("id", product.id);
-        if (error) {
-          toast.error("Erro ao excluir o produto.");
-          return;
-        }
-        setProducts((prev) => prev.filter((p) => p.id !== product.id));
-        if (user) {
-          const mov = {
-            user_id: user.id,
-            product_id: null,
-            produto_nome: product.produto,
-            codigo: product.codigo,
-            acao: "excluir",
-            delta: -product.quantidade,
-            quantidade_anterior: product.quantidade,
-            quantidade_nova: 0,
-          };
-          const { data } = await supabase.from("stock_movements").insert(mov).select().single();
-          if (data) setMovements((prev) => [data as Movement, ...prev]);
-        }
-        toast.success("Produto excluído.");
-      },
-    });
-  };
-
-  // ---- Categorias ----
   const adicionarCategoria = async (nome: string, icon: string, termo: string) => {
     if (!user) return;
     const { data, error } = await supabase
@@ -313,9 +200,7 @@ function Estoque() {
       .select()
       .single();
     if (error) {
-      toast.error(
-        error.code === "23505" ? "Já existe uma categoria com esse nome." : "Erro ao criar categoria.",
-      );
+      toast.error("Erro ao criar categoria.");
       return;
     }
     setCategories((prev) => [...prev, data as Category].sort((a, b) => a.nome.localeCompare(b.nome)));
@@ -326,57 +211,19 @@ function Estoque() {
     setConfirm({
       open: true,
       title: `Excluir categoria "${cat.nome}"?`,
-      description: "Os produtos não são apagados — apenas o filtro de categoria é removido.",
-      confirmLabel: "Excluir",
-      danger: true,
       onConfirm: async () => {
         setConfirm((c) => ({ ...c, open: false }));
-        const { error } = await supabase.from("categories").delete().eq("id", cat.id);
-        if (error) {
-          toast.error("Erro ao excluir categoria.");
-          return;
-        }
+        await supabase.from("categories").delete().eq("id", cat.id);
         setCategories((prev) => prev.filter((c) => c.id !== cat.id));
-        if (filtroCard === cat.termo) setFiltroCard(null);
         toast.success("Categoria excluída.");
       },
     });
-  };
-
-  // ---- Dados de exemplo ----
-  const carregarExemplos = async () => {
-    if (!user) return;
-    const { error: e1 } = await supabase
-      .from("products")
-      .insert(PRODUTOS_EXEMPLO.map((p) => ({ ...p, user_id: user.id })));
-    await supabase
-      .from("categories")
-      .insert(CATEGORIAS_EXEMPLO.map((c) => ({ ...c, user_id: user.id })));
-    if (e1) {
-      toast.error("Erro ao carregar dados de exemplo.");
-      return;
-    }
-    toast.success("Dados de exemplo carregados.");
-    carregarDados();
   };
 
   const sair = async () => {
     await supabase.auth.signOut();
     navigate({ to: "/" });
   };
-
-  // ---- Derivados ----
-  const sugestoes = useMemo(() => {
-    const termo = busca.trim().toLowerCase();
-    if (termo === "") return [];
-    const valores = new Set<string>();
-    for (const p of products) {
-      for (const campo of [p.produto, p.fabricante, p.tipo, p.codigo]) {
-        if (campo.toLowerCase().includes(termo)) valores.add(campo);
-      }
-    }
-    return Array.from(valores).slice(0, 6);
-  }, [busca, products]);
 
   const resultados = useMemo(() => {
     const termo = busca.trim().toLowerCase();
@@ -385,666 +232,277 @@ function Estoque() {
       .filter((p) => {
         const alvo = `${p.produto} ${p.tipo} ${p.fabricante}`.toLowerCase();
         const matchCard = card ? alvo.includes(card) : true;
-        const matchBusca =
-          termo === "" ||
-          p.codigo.toLowerCase().includes(termo) ||
-          p.fabricante.toLowerCase().includes(termo) ||
-          p.tipo.toLowerCase().includes(termo) ||
-          p.produto.toLowerCase().includes(termo);
+        const matchBusca = termo === "" || p.codigo.toLowerCase().includes(termo) || p.fabricante.toLowerCase().includes(termo) || p.produto.toLowerCase().includes(termo);
         const precisaRepor = p.quantidade < p.minimo;
-        const matchRepor =
-          filtroRepor === null ? true : filtroRepor === "repor" ? precisaRepor : !precisaRepor;
+        const matchRepor = filtroRepor === null ? true : filtroRepor === "repor" ? precisaRepor : !precisaRepor;
         return matchCard && matchBusca && matchRepor;
       })
-      .sort((a, b) =>
-        (a.codigo || "").localeCompare(b.codigo || "", undefined, {
-          numeric: true,
-          sensitivity: "base",
-        }),
-      );
+      .sort((a, b) => (a.codigo || "").localeCompare(b.codigo || "", undefined, { numeric: true }));
   }, [busca, filtroCard, filtroRepor, products]);
 
-  const totalProdutos = products.length;
-  const totalItens = products.reduce((soma, p) => soma + p.quantidade, 0);
-  const itensAbaixo = products.filter((p) => p.quantidade < p.minimo).length;
+  const stats = useMemo(() => ({
+    total: products.length,
+    unidades: products.reduce((s, p) => s + p.quantidade, 0),
+    criticos: products.filter(p => p.quantidade < p.minimo).length,
+    percentual: products.length ? Math.round((products.filter(p => p.quantidade >= p.minimo).length / products.length) * 100) : 100
+  }), [products]);
 
-  if (authLoading || (!user && carregando)) {
+  if (authLoading || (carregando && !products.length)) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background text-sm text-muted-foreground">
-        Carregando…
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="text-center space-y-4">
+          <div className="h-12 w-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-sm font-medium text-muted-foreground animate-pulse">Sincronizando Performance Experience™...</p>
+        </div>
       </div>
     );
   }
 
-  const btnAcao =
-    "flex items-center justify-center text-center rounded-xl border px-5 py-3 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5";
-
   return (
-    <div className="flex min-h-screen bg-background">
-      {/* Menu Lateral (Sidebar Desktop) */}
-      <aside className="hidden w-64 flex-col border-r border-border bg-card/50 backdrop-blur-md md:flex">
-        <div className="flex h-20 items-center justify-center border-b border-border px-6">
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />
-            <h2 className="font-display font-bold tracking-tight text-foreground">Inventory Menu</h2>
+    <div className="flex min-h-screen bg-background text-foreground selection:bg-primary/30">
+      <aside className={`fixed inset-y-0 left-0 z-40 transition-all duration-500 ease-in-out border-r border-white/5 bg-card/80 backdrop-blur-xl ${sidebarAberta ? 'w-64' : 'w-20'} hidden md:flex flex-col`}>
+        <div className="h-20 flex items-center px-6 border-b border-white/5">
+          <div className="flex items-center gap-3 overflow-hidden whitespace-nowrap">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-success flex items-center justify-center shadow-lg shadow-primary/20 shrink-0">
+              <Package className="h-6 w-6 text-primary-foreground" />
+            </div>
+            <span className={`font-display font-bold text-xl tracking-tight transition-opacity duration-300 ${sidebarAberta ? 'opacity-100' : 'opacity-0'}`}>Inventory IQ</span>
           </div>
         </div>
-        <nav className="flex-1 space-y-2 p-4">
-          <button
-            onClick={() => setFiltroRepor(null)}
-            className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
-              !filtroRepor ? "bg-primary/10 text-primary shadow-[0_0_15px_-5px_var(--color-primary)]" : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-            }`}
-          >
-            <LayoutDashboard className="h-4 w-4" />
-            Visão Geral
-          </button>
-          <button
-            onClick={() => navigate({ to: "/pedidos" })}
-            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground"
-          >
-            <ShoppingCart className="h-4 w-4" />
-            Pedidos
-          </button>
+
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+          {[
+            { id: 'dash', label: 'Dashboard', icon: LayoutDashboard, active: !filtroRepor, onClick: () => setFiltroRepor(null) },
+            { id: 'orders', label: 'Pedidos', icon: ShoppingCart, onClick: () => navigate({ to: '/pedidos' }) },
+            { id: 'history', label: 'Histórico', icon: History, onClick: () => setHistoryOpen(true) },
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={item.onClick}
+              className={`flex items-center gap-4 w-full p-3 rounded-xl transition-all duration-300 group ${item.active ? 'bg-primary/10 text-primary shadow-sm shadow-primary/10' : 'text-muted-foreground hover:bg-white/5 hover:text-white'}`}
+            >
+              <item.icon className={`h-5 w-5 shrink-0 ${item.active ? 'text-primary' : 'group-hover:scale-110 transition-transform'}`} />
+              <span className={`font-medium transition-opacity duration-300 ${sidebarAberta ? 'opacity-100' : 'opacity-0'}`}>{item.label}</span>
+            </button>
+          ))}
         </nav>
-        <div className="border-t border-border p-4">
-          <button
-            onClick={sair}
-            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-red-400 transition-all hover:bg-red-950/20"
-          >
-            <LogOut className="h-4 w-4" />
-            Sair
+
+        <div className="p-4 border-t border-white/5">
+          <button onClick={sair} className="flex items-center gap-4 w-full p-3 rounded-xl text-destructive hover:bg-destructive/10 transition-all group">
+            <LogOut className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
+            <span className={`font-medium ${sidebarAberta ? 'block' : 'hidden'}`}>Encerrar Sessão</span>
           </button>
         </div>
       </aside>
 
-      {/* Conteúdo Principal */}
-      <main className="flex-1 px-4 py-10 sm:py-16 overflow-y-auto">
-        <div className="mx-auto w-full max-w-4xl">
-        <div className="mb-4 flex justify-end">
-          {/* O botão "Sair" ficava aqui, mas foi movido para o rodapé */}
-        </div>
-
-        <header className="relative mb-8">
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-lg shadow-black/20 sm:p-8">
-            <div className="flex flex-col items-center gap-6 md:flex-row md:justify-between">
-              {/* Imagem à esquerda */}
-              <div className="shrink-0 select-none text-center">
-                <img
-                  src={inventoryLogo.url}
-                  alt="Ilustração de controle de inventário"
-                  className="mx-auto w-24 lg:w-28 xl:w-32"
-                />
-                <p className="mt-2 text-xs font-semibold tracking-wide text-primary">
-                  By Francisco Chagas
-                </p>
-                <button
-                  type="button"
-                  onClick={sair}
-                  className="mt-4 inline-flex items-center justify-center gap-2 rounded-lg border border-primary/40 bg-card px-4 py-2 text-xs font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] transition hover:bg-primary/10"
-                >
-                  <LogOut className="h-3.5 w-3.5" /> Sair
-                </button>
-              </div>
-
-              {/* Conteúdo central */}
-              <div className="flex-1 text-center">
-                <div className="flex flex-wrap items-center justify-center gap-2">
-                  <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-card px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-primary shadow-[0_0_18px_-6px_var(--color-primary)]">
-                    <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />
-                    Controle de Inventário
-                  </span>
-                  {user && (
-                    <span className="inline-flex max-w-full items-center gap-2 rounded-full border border-success/50 bg-success/10 px-4 py-1.5 text-xs font-medium text-success shadow-[0_0_18px_-6px_var(--color-primary)]">
-                      <span className="relative flex h-2 w-2 shrink-0">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
-                        <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
-                      </span>
-                      <span className="truncate">
-                        {(user.user_metadata?.full_name as string) ||
-                          (user.user_metadata?.name as string) ||
-                          user.email?.split("@")[0]}
-                      </span>
-                    </span>
-                  )}
-                </div>
-                <h1 className="mt-4 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-                  Gestão de produtos
-                </h1>
-                <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
-                  Dados salvos na nuvem. Gerencie produtos, categorias e o histórico de movimentações.
-                </p>
-              </div>
-
+      <main className={`flex-1 transition-all duration-500 ${sidebarAberta ? 'md:ml-64' : 'md:ml-20'}`}>
+        <header className="sticky top-0 z-30 h-20 border-b border-white/5 bg-background/80 backdrop-blur-md px-6 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button onClick={() => setSidebarAberta(!sidebarAberta)} className="p-2 hover:bg-white/5 rounded-lg text-muted-foreground transition-colors md:flex hidden">
+              <Menu className="h-5 w-5" />
+            </button>
+            <div className="flex flex-col">
+              <h1 className="text-lg font-bold tracking-tight">Gestão de Performance</h1>
+              <p className="text-xs text-muted-foreground">Sistema em tempo real — Cloud Sync</p>
             </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="hidden sm:flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10">
+              <div className="relative h-2 w-2">
+                <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-75" />
+                <span className="absolute inset-0 rounded-full bg-primary" />
+              </div>
+              <span className="text-xs font-semibold uppercase tracking-wider text-primary truncate max-w-[150px]">
+                {user?.email?.split('@')[0]}
+              </span>
+            </div>
+            <button className="p-2 hover:bg-white/5 rounded-full text-muted-foreground relative">
+              <Bell className="h-5 w-5" />
+              <span className="absolute top-1 right-1 h-2 w-2 bg-destructive rounded-full" />
+            </button>
           </div>
         </header>
 
-
-        {/* Alerta / contador */}
-        <div className="mt-10 mb-6 flex flex-wrap items-center justify-between gap-4">
-          <button
-            onClick={() => navigate({ to: "/pedidos" })}
-            className="inline-flex items-center gap-2 rounded-lg border border-red-700/60 bg-red-950/30 px-3 py-1.5 text-xs font-semibold text-red-200 shadow-[0_0_24px_-6px_rgba(153,27,27,0.85)] transition hover:bg-red-900/40"
-          >
-            <ShoppingCart className="h-3.5 w-3.5" /> Acessar Pedidos
-          </button>
-          <div
-            className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-semibold ${
-              itensAbaixo > 0
-                ? "border-red-700/60 bg-red-950/30 text-red-200 shadow-[0_0_24px_-6px_rgba(153,27,27,0.85)]"
-                : "border-primary/40 bg-primary/10 text-foreground shadow-[0_0_18px_-6px_var(--color-primary)]"
-            }`}
-          >
-            {itensAbaixo > 0 ? (
-              <>🔴 {itensAbaixo} {itensAbaixo === 1 ? "item está" : "itens estão"} abaixo do mínimo</>
-            ) : (
-              <>✅ Todos os itens estão acima do estoque mínimo</>
-            )}
+        <div className="p-6 md:p-10 space-y-8 animate-fade-in">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { label: 'Total de SKUs', value: stats.total, icon: Package, color: 'primary' },
+              { label: 'Itens Críticos', value: stats.criticos, icon: AlertCircle, color: stats.criticos > 0 ? 'destructive' : 'success' },
+              { label: 'Unidades em Stock', value: stats.unidades, icon: LayoutDashboard, color: 'primary' },
+              { label: 'Eficiência de Stock', value: `${stats.percentual}%`, icon: CheckCircle2, color: 'success' },
+            ].map((stat, i) => (
+              <div key={i} className="glass-card p-6 rounded-2xl border border-white/5 hover:border-primary/20 transition-all group">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground mb-1 uppercase tracking-widest">{stat.label}</p>
+                    <h3 className="text-2xl font-bold tracking-tight">{stat.value}</h3>
+                  </div>
+                  <div className={`p-2 rounded-lg bg-${stat.color}/10 text-${stat.color} group-hover:scale-110 transition-transform`}>
+                    <stat.icon className="h-5 w-5" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
 
-        {/* Barra de ferramentas */}
-        <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <button
-            type="button"
-            onClick={() => setProductModal({ open: true, product: null })}
-            className="rounded-xl border border-primary bg-primary/15 px-3 py-3 text-sm font-semibold text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] transition hover:bg-primary/25"
-          >
-            ➕ Novo produto
-          </button>
-          <button
-            type="button"
-            onClick={() => setCategoryOpen(true)}
-            className="rounded-xl border border-primary/40 bg-card px-3 py-3 text-sm font-semibold text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] transition hover:bg-primary/10"
-          >
-            🗂️ Categorias
-          </button>
-          <button
-            type="button"
-            onClick={() => setHistoryOpen(true)}
-            className="rounded-xl border border-primary/40 bg-card px-3 py-3 text-sm font-semibold text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] transition hover:bg-primary/10"
-          >
-            🕘 Histórico
-          </button>
-        </div>
-
-        {/* Exportação */}
-        <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <button
-            type="button"
-            onClick={() => exportarCSV(resultados, filtroRepor === "repor")}
-            className="rounded-xl border border-primary/40 bg-card px-3 py-3 text-sm font-semibold text-foreground transition hover:bg-primary/10"
-          >
-            📊 Exportar Excel (CSV)
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              exportarPDF(resultados, filtroRepor === "repor").catch(() =>
-                toast.error("Não foi possível gerar o PDF."),
-              )
-            }
-            className="rounded-xl border border-primary/40 bg-card px-3 py-3 text-sm font-semibold text-foreground transition hover:bg-primary/10"
-          >
-            📄 Exportar PDF
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              exportarPDF(
-                products.filter((p) => p.quantidade < p.minimo),
-                true,
-              ).catch(() => toast.error("Não foi possível gerar o PDF."))
-            }
-            className="rounded-xl border border-red-900/50 bg-card px-3 py-3 text-sm font-semibold text-red-200 transition hover:bg-red-950/30"
-          >
-            📄 PDF dos itens a repor
-          </button>
-        </div>
-
-
-        {/* Campo de busca */}
-        <div className="mb-8">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              setMostrarSugestoes(false);
-            }}
-            className="flex flex-col gap-3 sm:flex-row sm:items-stretch"
-          >
-            <div className="relative flex-1">
-              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-lg text-muted-foreground">
-                🔎
-              </span>
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex-1 relative group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <input
-                type="search"
+                type="text"
+                placeholder="Pesquisar por Código, Produto ou Fabricante..."
+                className="w-full bg-card/50 border border-white/5 rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all shadow-inner"
                 value={busca}
-                onChange={(e) => {
-                  setBusca(e.target.value);
-                  setMostrarSugestoes(true);
-                }}
-                onFocus={() => setMostrarSugestoes(true)}
-                onBlur={() => setTimeout(() => setMostrarSugestoes(false), 150)}
-                placeholder="Buscar por código, fabricante, tipo ou produto…"
-                autoComplete="off"
-                className="w-full rounded-xl border border-input bg-card px-12 py-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/40"
+                onChange={(e) => setBusca(e.target.value)}
               />
-              {busca && (
-                <button
-                  type="button"
-                  onClick={() => setBusca("")}
-                  aria-label="Limpar busca"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md px-2 py-1 text-sm text-muted-foreground transition hover:text-foreground"
-                >
-                  ✕
-                </button>
-              )}
-              {mostrarSugestoes && sugestoes.length > 0 && (
-                <ul className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-primary/40 bg-card shadow-[0_0_20px_-4px_var(--color-primary)]">
-                  {sugestoes.map((s) => (
-                    <li key={s}>
-                      <button
-                        type="button"
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          setBusca(s);
-                          setMostrarSugestoes(false);
-                        }}
-                        className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition hover:bg-primary/10"
-                      >
-                        <span className="text-muted-foreground">🔎</span>
-                        <span>{s}</span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
             </div>
-            <button
-              type="submit"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-primary bg-primary px-6 py-4 text-sm font-semibold text-primary-foreground shadow-[0_0_18px_-6px_var(--color-primary)] transition hover:opacity-90"
-            >
-              🔎 Buscar
-            </button>
-          </form>
-        </div>
-
-        {/* Resumo */}
-        <div className="mb-6 flex flex-wrap items-center justify-center gap-3 rounded-xl border border-primary/30 bg-card px-5 py-4 shadow-[0_0_18px_-6px_var(--color-primary)] sm:justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">📦</span>
-            <div>
-              <div className="font-display text-sm font-semibold text-foreground">
-                Resumo do estoque
-              </div>
-              <div className="text-xs text-muted-foreground">Itens cadastrados no momento</div>
+            <div className="flex gap-2">
+              <button 
+                onClick={() => setProductModal({ open: true, product: null })}
+                className="flex items-center gap-2 bg-primary text-primary-foreground px-6 py-4 rounded-2xl font-bold hover:premium-glow transition-all active:scale-95"
+              >
+                <Plus className="h-5 w-5" /> Novo Produto
+              </button>
+              <button 
+                onClick={() => setHistoryOpen(true)}
+                className="p-4 bg-white/5 hover:bg-white/10 border border-white/5 rounded-2xl transition-all"
+                title="Histórico"
+              >
+                <History className="h-6 w-6" />
+              </button>
             </div>
           </div>
-          <div className="flex items-center gap-6">
-            <div className="text-center">
-              <div className="font-display text-2xl font-bold text-primary">{totalProdutos}</div>
-              <div className="text-xs text-muted-foreground">Produtos</div>
-            </div>
-            <div className="h-8 w-px bg-border" />
-            <div className="text-center">
-              <div className="font-display text-2xl font-bold text-primary">
-                {totalItens.toLocaleString("pt-BR")}
-              </div>
-              <div className="text-xs text-muted-foreground">Itens (un.)</div>
-            </div>
-          </div>
-        </div>
 
-        {/* Categorias (cards de filtro) */}
-        {categories.length > 0 && (
-          <section className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {categories.map((c) => {
-              const ativo = filtroCard === c.termo;
-              const total = products.filter((p) =>
-                `${p.produto} ${p.tipo} ${p.fabricante}`.toLowerCase().includes(c.termo),
-              ).length;
-              return (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => setFiltroCard(ativo ? null : c.termo)}
-                  className={`group flex h-full flex-col rounded-xl border p-4 text-left transition-colors duration-300 ${
-                    ativo
-                      ? "border-primary bg-primary/10 shadow-[0_0_24px_-2px_var(--color-primary),inset_0_0_0_1px_var(--color-primary)]"
-                      : "border-primary/30 bg-card shadow-[0_0_18px_-6px_var(--color-primary)] hover:bg-primary/5"
-                  }`}
-                >
-                  <div className="text-2xl">{c.icon}</div>
-                  <div className="mt-2 font-display text-sm font-semibold">{c.nome}</div>
-                  <div className="mt-auto pt-1 text-xs text-muted-foreground">{total} produto(s)</div>
-                </button>
-
-              );
-            })}
-          </section>
-        )}
-
-        {/* Filtros / ações em lote */}
-        <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-5">
-          <button
-            type="button"
-            onClick={() => setFiltroRepor(filtroRepor === "repor" ? null : "repor")}
-            className={`${btnAcao} ${
-              filtroRepor === "repor"
-                ? "border-red-600 bg-red-950/40 text-red-200 shadow-[0_0_28px_-2px_rgba(153,27,27,0.9)]"
-                : "border-red-900/50 bg-card text-foreground shadow-[0_0_18px_-6px_rgba(153,27,27,0.8)] hover:bg-red-950/20"
-            }`}
-          >
-            🔴 Precisa repor
-          </button>
-          <button
-            type="button"
-            onClick={() => setFiltroRepor(filtroRepor === "ok" ? null : "ok")}
-            className={`${btnAcao} ${
-              filtroRepor === "ok"
-                ? "border-primary bg-primary/15 text-foreground shadow-[0_0_28px_-2px_var(--color-primary)]"
-                : "border-primary/40 bg-card text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] hover:bg-primary/10"
-            }`}
-          >
-            ✅ Não precisa repor
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setFiltroCard(null);
-              setFiltroRepor(null);
-              setBusca("");
-            }}
-            className={`${btnAcao} border-primary/40 bg-card text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] hover:bg-primary/10`}
-          >
-            📦 Carregar tudo
-          </button>
-          <button
-            type="button"
-            onClick={completarTodos}
-            className={`${btnAcao} border-primary bg-primary/15 text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] hover:bg-primary/25`}
-          >
-            ✅ Completar estoque (todos)
-          </button>
-          <button
-            type="button"
-            onClick={zerarEstoque}
-            className={`${btnAcao} border-red-600 bg-red-950/40 text-red-200 shadow-[0_0_18px_-6px_rgba(153,27,27,0.9)] hover:bg-red-900/50`}
-          >
-            🗑️ Zerar estoque
-          </button>
-        </div>
-
-        {/* Card informativo: Curva ABC e boas práticas de gestão */}
-        <section className="mb-8 rounded-2xl border border-primary/30 bg-card p-5 shadow-[0_0_24px_-10px_var(--color-primary)] sm:p-6">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">📊</span>
-            <h2 className="font-display text-lg font-semibold">Curva ABC</h2>
-          </div>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Classificação dos produtos conforme a importância financeira
-            (<strong className="text-foreground">A</strong> = maior valor/giro,{" "}
-            <strong className="text-foreground">C</strong> = menor).
-          </p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-xl border border-border bg-background p-4">
-              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                <span>🔢</span> SKUs
-              </div>
-              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                Quantos SKUs (itens diferentes) você precisa gerenciar.
-              </p>
-            </div>
-            <div className="rounded-xl border border-border bg-background p-4">
-              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                <span>🗄️</span> Organização da armazenagem
-              </div>
-              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                Cuida do espaço físico ou virtual onde os itens ficam guardados.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Lista */}
-        <section className="rounded-2xl border border-border bg-card p-4 shadow-lg shadow-black/20 sm:p-6">
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <h2 className="font-display text-lg font-semibold">
-                {filtroCard
-                  ? `Filtro: ${categories.find((c) => c.termo === filtroCard)?.nome ?? filtroCard}`
-                  : "Todos os produtos"}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <FileText className="h-5 w-5 text-primary" /> 
+                {filtroRepor === 'repor' ? 'Itens para Reposição' : 'Inventário Completo'}
+                <span className="ml-2 px-2 py-0.5 rounded-md bg-white/5 text-xs text-muted-foreground">{resultados.length} resultados</span>
               </h2>
-              {listaOculta ? (
-                <button
-                  type="button"
-                  onClick={() => setListaOculta(false)}
-                  title="Mostrar produtos"
-                  aria-label="Mostrar produtos"
-                  className="inline-flex items-center gap-2 rounded-full bg-green-600 py-1.5 pl-4 pr-1.5 text-sm font-semibold text-white shadow-md transition hover:bg-green-700"
-                >
-                  Mostrar
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-green-600">
-                    <ArrowRight className="h-4 w-4" />
-                  </span>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setListaOculta(true)}
-                  title="Ocultar produtos"
-                  aria-label="Ocultar produtos"
-                  className="inline-flex items-center gap-2 rounded-full bg-red-600 py-1.5 pl-1.5 pr-4 text-sm font-semibold text-white shadow-md transition hover:bg-red-700"
-                >
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-red-600">
-                    <X className="h-4 w-4" />
-                  </span>
-                  Ocultar
-                </button>
-              )}
-            </div>
-            <span className="text-xs text-muted-foreground">{resultados.length} resultado(s)</span>
-          </div>
-
-
-          {listaOculta ? (
-            <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-              A lista de produtos está oculta.
-            </div>
-          ) : carregando ? (
-            <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-              Carregando produtos…
-            </div>
-          ) : products.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border p-8 text-center">
-              <p className="text-sm text-muted-foreground">
-                Você ainda não tem produtos cadastrados.
-              </p>
-              <div className="mt-4 flex flex-wrap justify-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => setProductModal({ open: true, product: null })}
-                  className="rounded-xl border border-primary bg-primary/15 px-5 py-2.5 text-sm font-semibold text-foreground shadow-[0_0_18px_-6px_var(--color-primary)] transition hover:bg-primary/25"
-                >
-                  ➕ Criar primeiro produto
-                </button>
-                <button
-                  type="button"
-                  onClick={carregarExemplos}
-                  className="rounded-xl border border-primary/40 bg-card px-5 py-2.5 text-sm font-semibold text-foreground transition hover:bg-primary/10"
-                >
-                  📥 Carregar dados de exemplo
-                </button>
+              <div className="flex items-center gap-2 text-xs">
+                <button onClick={() => exportarPDF(resultados, filtroRepor === 'repor')} className="px-3 py-1.5 hover:bg-white/5 rounded-lg border border-white/5 transition-colors">PDF</button>
+                <button onClick={() => exportarCSV(resultados, filtroRepor === 'repor')} className="px-3 py-1.5 hover:bg-white/5 rounded-lg border border-white/5 transition-colors">CSV</button>
               </div>
             </div>
-          ) : resultados.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-              Nenhum produto encontrado para a busca informada.
-            </div>
-          ) : (
-            <ul className="grid gap-3">
+
+            <div className="grid grid-cols-1 gap-4">
               {resultados.map((p) => {
-                const atual = p.quantidade;
-                const baixo = atual < p.minimo;
-                const acima = atual > p.minimo;
+                const perc = Math.min(100, (p.quantidade / p.minimo) * 100);
+                const isCritical = p.quantidade < p.minimo;
                 return (
-                  <li
-                    key={p.id}
-                    className={`rounded-xl border bg-background p-4 transition-colors duration-300 ${
-                      baixo
-                        ? "border-red-700/60 shadow-[0_0_24px_-2px_rgba(153,27,27,0.85)]"
-                        : "border-primary/20"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="rounded-md bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground">
-                            {p.codigo || "—"}
-                          </span>
-                          <h3 className="font-display text-sm font-semibold text-foreground">
-                            {p.produto}
-                          </h3>
+                  <div key={p.id} className={`glass-card p-4 rounded-2xl border transition-all hover:translate-x-1 ${isCritical ? 'border-destructive/20 hover:border-destructive/40 shadow-sm shadow-destructive/5' : 'border-white/5 hover:border-primary/30 shadow-sm shadow-black/20'}`}>
+                    <div className="flex flex-col md:flex-row md:items-center gap-6">
+                      <div className="w-16 h-16 rounded-xl bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
+                        <span className="text-xl font-bold text-muted-foreground">{p.codigo}</span>
+                      </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-bold text-lg truncate">{p.produto}</h4>
+                          {isCritical && <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-destructive/10 text-destructive uppercase tracking-widest border border-destructive/20">Crítico</span>}
                         </div>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          <strong className="text-foreground">Fabricante:</strong> {p.fabricante}{" "}
-                          • <strong className="text-foreground">Tipo:</strong> {p.tipo}
-                        </p>
+                        <p className="text-sm text-muted-foreground truncate">{p.fabricante} • {p.tipo}</p>
                       </div>
-                      <div className="flex shrink-0 gap-1.5">
-                        <button
-                          type="button"
+
+                      <div className="w-full md:w-48 shrink-0 space-y-2">
+                        <div className="flex justify-between text-xs font-medium">
+                          <span className="text-muted-foreground">Status do Estoque</span>
+                          <span className={isCritical ? 'text-destructive' : 'text-primary'}>{p.quantidade} / {p.minimo}</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                          <div 
+                            className={`h-full transition-all duration-1000 ${isCritical ? 'bg-destructive' : 'bg-primary'}`} 
+                            style={{ width: `${perc}%` }} 
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <div className="flex items-center bg-black/20 rounded-xl border border-white/5 p-1">
+                          <button 
+                            onClick={() => ajustarEstoque(p, -1)}
+                            className="p-2 hover:text-destructive transition-colors"
+                          >
+                            <span className="text-xl leading-none">−</span>
+                          </button>
+                          <input 
+                            type="number"
+                            className="w-12 bg-transparent text-center font-bold outline-none text-sm"
+                            value={reposicoes[p.id] || ""}
+                            onChange={(e) => setReposicoes(prev => ({ ...prev, [p.id]: e.target.value }))}
+                            placeholder="0"
+                          />
+                          <button 
+                            onClick={() => ajustarEstoque(p, 1)}
+                            className="p-2 hover:text-primary transition-colors"
+                          >
+                            <span className="text-xl leading-none">+</span>
+                          </button>
+                        </div>
+                        <button 
                           onClick={() => setProductModal({ open: true, product: p })}
-                          aria-label="Editar produto"
-                          title="Editar produto"
-                          className="rounded-lg border border-primary/40 px-2.5 py-1 text-xs font-semibold text-foreground transition hover:bg-primary/10"
+                          className="p-3 hover:bg-white/5 rounded-xl transition-all"
                         >
-                          ✏️
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => excluirProduto(p)}
-                          aria-label="Excluir produto"
-                          title="Excluir produto"
-                          className="rounded-lg border border-red-900/50 px-2.5 py-1 text-xs font-semibold text-red-300 transition hover:bg-red-950/40"
-                        >
-                          🗑️
+                          <ChevronRight className="h-5 w-5 text-muted-foreground" />
                         </button>
                       </div>
                     </div>
-
-                    <div className="mt-3 flex items-center gap-3">
-                      <div className="h-2 w-32 overflow-hidden rounded-full bg-secondary">
-                        <div
-                          className={`h-full rounded-full ${baixo ? "bg-warning" : "bg-primary"}`}
-                          style={{ width: `${Math.min(100, (atual / Math.max(1, p.minimo)) * 100)}%` }}
-                        />
-                      </div>
-                      <span className="text-xs text-muted-foreground">
-                        {atual} / mín. {p.minimo} un.
-                      </span>
-                    </div>
-
-                    <div
-                      className={`mt-3 flex flex-wrap items-center gap-2 rounded-lg border p-2 ${
-                        baixo || acima
-                          ? "border-warning/30 bg-warning/5"
-                          : "border-primary/30 bg-primary/5"
-                      }`}
-                    >
-                      <span className="text-xs font-medium text-foreground">
-                        {baixo
-                          ? `Faltam ${p.minimo - atual} un.`
-                          : acima
-                            ? `⚠️ Excedeu em ${atual - p.minimo} un.`
-                            : "✅ Estoque completo (100%)"}
-                      </span>
-                      <input
-                        type="number"
-                        min={1}
-                        value={reposicoes[p.id] ?? ""}
-                        onChange={(e) =>
-                          setReposicoes((prev) => ({ ...prev, [p.id]: e.target.value }))
-                        }
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") ajustarEstoque(p, 1);
-                        }}
-                        placeholder="Qtd."
-                        className="h-8 w-24 rounded-md border border-input bg-background px-2 text-xs outline-none transition focus:border-primary focus:ring-1 focus:ring-ring/40"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => ajustarEstoque(p, 1)}
-                        className="h-8 rounded-md border border-primary/40 bg-primary/10 px-3 text-xs font-semibold text-foreground transition hover:bg-primary/20"
-                      >
-                        ➕ Entrada
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => ajustarEstoque(p, -1)}
-                        disabled={atual <= 0}
-                        className="h-8 rounded-md border border-warning/40 bg-warning/10 px-3 text-xs font-semibold text-foreground transition hover:bg-warning/20 disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        ➖ Saída
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => completarMinimo(p)}
-                        disabled={atual >= p.minimo}
-                        className="h-8 rounded-md border border-primary bg-primary/15 px-3 text-xs font-semibold text-foreground transition hover:bg-primary/25 disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        ⤴️ Completar mínimo
-                      </button>
-                    </div>
-                  </li>
+                  </div>
                 );
               })}
-            </ul>
-          )}
-        </section>
+            </div>
+          </div>
+        </div>
 
-        <footer className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <button
-            type="button"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-primary/40 bg-card px-6 py-3 text-sm font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] transition hover:bg-primary/10 sm:w-auto"
-          >
-            ↑ Voltar ao Início
-          </button>
+        <footer className="p-10 border-t border-white/5 text-center space-y-4">
+          <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed uppercase tracking-widest font-bold">
+             PERFORMANCE EXPERIENCE™
+          </p>
+          <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
+            By Francisco Chagas. Engenharia de Gestão de Inventário de Alta Precisão. © 2026 Todos os direitos reservados.
+          </p>
         </footer>
-      </div>
-
-      <Suspense fallback={null}>
-        <ProductFormModal
-          open={productModal.open}
-          product={productModal.product}
-          onSave={salvarProduto}
-          onClose={() => setProductModal({ open: false, product: null })}
-        />
-        <CategoryModal
-          open={categoryOpen}
-          categories={categories}
-          onAdd={adicionarCategoria}
-          onDelete={excluirCategoria}
-          onClose={() => setCategoryOpen(false)}
-        />
-        <HistoryModal
-          open={historyOpen}
-          movements={movements}
-          onClose={() => setHistoryOpen(false)}
-        />
-        <ConfirmModal
-          open={confirm.open}
-          title={confirm.title}
-          description={confirm.description}
-          confirmLabel={confirm.confirmLabel}
-          danger={confirm.danger}
-          onConfirm={confirm.onConfirm}
-          onCancel={() => setConfirm((c) => ({ ...c, open: false }))}
-        />
-      </Suspense>
       </main>
+
+      <Suspense>
+        {confirm.open && (
+          <ConfirmModal
+            open={confirm.open}
+            onCancel={() => setConfirm(prev => ({ ...prev, open: false }))}
+            onConfirm={confirm.onConfirm}
+            title={confirm.title}
+            description={confirm.description}
+            confirmLabel={confirm.confirmLabel}
+            danger={confirm.danger}
+          />
+        )}
+        {productModal.open && (
+          <ProductFormModal
+            open={productModal.open}
+            onClose={() => setProductModal({ open: false, product: null })}
+            onSave={salvarProduto}
+            product={productModal.product}
+          />
+        )}
+        {categoryOpen && (
+          <CategoryModal
+            open={categoryOpen}
+            onClose={() => setCategoryOpen(false)}
+            categories={categories}
+            onAdd={adicionarCategoria}
+            onDelete={excluirCategoria}
+          />
+        )}
+        {historyOpen && (
+          <HistoryModal
+            open={historyOpen}
+            onClose={() => setHistoryOpen(false)}
+            movements={movements}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }

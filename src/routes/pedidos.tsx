@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { LogOut, ArrowRight, ShoppingCart, Search, AlertCircle, Package } from "lucide-react";
+import { LogOut, LayoutDashboard, ShoppingCart, Search, AlertCircle, Package, ArrowLeft, ChevronRight, FileText, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { type Product, ordenarPorCodigo } from "@/lib/estoque";
@@ -10,11 +10,8 @@ export const Route = createFileRoute("/pedidos")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Pedidos de Compra — Inventory Control" },
-      {
-        name: "description",
-        content: "Visualize e gerencie itens que necessitam de reposição.",
-      },
+      { title: "Pedidos | Performance Experience" },
+      { name: "description", content: "Itens críticos aguardando reposição de estoque." },
     ],
   }),
   component: Pedidos,
@@ -38,9 +35,7 @@ function Pedidos() {
       const criticos = (data as Product[]).filter(p => p.quantidade < p.minimo);
       setProducts(ordenarPorCodigo(criticos));
     } else if (error) {
-      toast.error("Erro ao carregar itens para pedido.");
-    } else {
-      setProducts(ordenarPorCodigo((data as Product[]) ?? []));
+      toast.error("Erro na sincronização de pedidos.");
     }
     setLoading(false);
   }, [user]);
@@ -63,122 +58,145 @@ function Pedidos() {
 
   if (authLoading || loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background text-sm text-muted-foreground">
-        Carregando pedidos…
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="text-center space-y-4">
+          <div className="h-12 w-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-sm font-medium text-muted-foreground animate-pulse">Consultando Itens Críticos...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background px-4 py-10 sm:py-16">
-      <div className="mx-auto w-full max-w-4xl">
-        <header className="mb-8">
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-lg shadow-black/20 sm:p-8">
-            <div className="flex flex-col items-center gap-6 md:flex-row md:justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/20 text-primary shadow-[0_0_15px_rgba(var(--color-primary),0.3)]">
-                  <ShoppingCart className="h-6 w-6" />
-                </div>
-                <div>
-                  <h1 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                    Pedidos de Compra
-                  </h1>
-                  <p className="text-sm text-muted-foreground">
-                    Itens com estoque abaixo do mínimo necessário.
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => navigate({ to: "/estoque" })}
-                className="inline-flex items-center gap-2 rounded-xl border border-primary/40 bg-card px-4 py-2 text-sm font-semibold text-primary shadow-[0_0_18px_-6px_var(--color-primary)] transition hover:bg-primary/10"
-              >
-                📦 Voltar ao Estoque
-              </button>
-            </div>
-          </div>
-        </header>
-
-        <div className="mb-6 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-xl border border-red-700/40 bg-red-950/20 p-4 shadow-[0_0_20px_-10px_rgba(239,68,68,0.5)]">
-            <div className="flex items-center gap-2 text-red-200">
-              <AlertCircle className="h-5 w-5" />
-              <span className="text-sm font-semibold">Itens Críticos</span>
-            </div>
-            <div className="mt-2 font-display text-2xl font-bold text-red-100">
-              {products.length} <span className="text-sm font-normal text-red-300/70">produtos</span>
-            </div>
-          </div>
-          <div className="rounded-xl border border-primary/30 bg-primary/10 p-4 shadow-[0_0_20px_-10px_rgba(var(--color-primary),0.5)]">
-            <div className="flex items-center gap-2 text-primary">
-              <Package className="h-5 w-5" />
-              <span className="text-sm font-semibold">Volume a Comprar</span>
-            </div>
-            <div className="mt-2 font-display text-2xl font-bold text-foreground">
-              {totalFaltante.toLocaleString("pt-BR")} <span className="text-sm font-normal text-muted-foreground">unidades</span>
-            </div>
+    <div className="min-h-screen bg-background text-foreground selection:bg-primary/30 animate-fade-in">
+      {/* Header Premium */}
+      <header className="sticky top-0 z-30 h-20 border-b border-white/5 bg-background/80 backdrop-blur-md px-6 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <button onClick={() => navigate({ to: "/estoque" })} className="p-2 hover:bg-white/5 rounded-lg text-muted-foreground transition-colors group">
+            <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
+          </button>
+          <div className="flex flex-col">
+            <h1 className="text-lg font-bold tracking-tight">Módulo de Pedidos</h1>
+            <p className="text-xs text-muted-foreground">Itens abaixo do mínimo padronizado</p>
           </div>
         </div>
 
-        <div className="mb-6 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => navigate({ to: "/estoque" })}
+            className="hidden sm:flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-sm font-bold hover:bg-white/10 transition-all"
+          >
+            <Package className="h-4 w-4" /> Voltar ao Estoque
+          </button>
+        </div>
+      </header>
+
+      <main className="p-6 md:p-10 max-w-5xl mx-auto space-y-8">
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="glass-card p-6 rounded-2xl border border-destructive/20 shadow-sm shadow-destructive/5 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:scale-110 transition-transform">
+              <AlertCircle className="h-20 w-20 text-destructive" />
+            </div>
+            <p className="text-xs font-medium text-muted-foreground mb-1 uppercase tracking-widest">Produtos em Alerta</p>
+            <h3 className="text-3xl font-bold tracking-tight text-destructive">{products.length}</h3>
+            <p className="text-xs text-destructive/70 mt-2">Requerem atenção imediata</p>
+          </div>
+          
+          <div className="glass-card p-6 rounded-2xl border border-primary/20 shadow-sm shadow-primary/5 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:scale-110 transition-transform">
+              <ShoppingCart className="h-20 w-20 text-primary" />
+            </div>
+            <p className="text-xs font-medium text-muted-foreground mb-1 uppercase tracking-widest">Volume Necessário</p>
+            <h3 className="text-3xl font-bold tracking-tight text-primary">{totalFaltante.toLocaleString("pt-BR")}</h3>
+            <p className="text-xs text-primary/70 mt-2">Unidades para atingir o mínimo</p>
+          </div>
+        </div>
+
+        {/* Search */}
+        <div className="relative group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
           <input
             type="text"
-            placeholder="Filtrar pedidos..."
+            placeholder="Filtrar por produto, código ou fabricante..."
+            className="w-full bg-card/50 border border-white/5 rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all"
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
-            className="w-full rounded-xl border border-border bg-card pl-10 pr-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-1 focus:ring-primary/40"
           />
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-4 shadow-lg shadow-black/20 sm:p-6">
-          {filtrados.length === 0 ? (
-            <div className="py-12 text-center text-muted-foreground">
-              {busca ? "Nenhum pedido encontrado para esta busca." : "✅ Tudo em ordem! Nenhum item precisa de reposição."}
-            </div>
-          ) : (
-            <ul className="grid gap-3">
-              {filtrados.map((p) => (
-                <li
-                  key={p.id}
-                  className="group rounded-xl border border-red-700/40 bg-background p-4 shadow-[0_0_15px_-5px_rgba(239,68,68,0.2)] transition-all hover:border-red-600/60"
-                >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="rounded-md bg-secondary px-2 py-0.5 text-[10px] font-bold text-secondary-foreground">
-                          {p.codigo}
-                        </span>
-                        <h3 className="font-display text-sm font-bold text-foreground">{p.produto}</h3>
-                      </div>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {p.fabricante} • {p.tipo}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-xs font-medium text-red-400">Faltam {p.minimo - p.quantidade} un.</div>
-                      <div className="mt-1 text-[10px] text-muted-foreground">
-                        Estoque: {p.quantidade} / Mín: {p.minimo}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-secondary/50">
-                    <div
-                      className="h-full bg-red-600 transition-all duration-500"
-                      style={{ width: `${(p.quantidade / p.minimo) * 100}%` }}
-                    />
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        {/* List */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              <FileText className="h-5 w-5 text-primary" /> 
+              Lista de Compras
+              <span className="ml-2 px-2 py-0.5 rounded-md bg-white/5 text-xs text-muted-foreground">{filtrados.length} itens</span>
+            </h2>
+          </div>
 
-        <footer className="mt-8 flex justify-center">
-          <p className="text-xs text-muted-foreground">
-            Inventory Control • Módulo de Pedidos Automático
-          </p>
-        </footer>
-      </div>
+          <div className="grid grid-cols-1 gap-4">
+            {filtrados.length === 0 ? (
+              <div className="py-20 text-center glass-card rounded-3xl border border-dashed border-white/10">
+                <CheckCircle2 className="h-12 w-12 text-success mx-auto mb-4 opacity-50" />
+                <h3 className="text-lg font-bold">Nenhum pedido pendente</h3>
+                <p className="text-muted-foreground text-sm">Todo o estoque está operando acima do mínimo.</p>
+              </div>
+            ) : (
+              filtrados.map((p) => {
+                const falta = p.minimo - p.quantidade;
+                const perc = Math.min(100, (p.quantidade / p.minimo) * 100);
+                return (
+                  <div key={p.id} className="glass-card p-6 rounded-2xl border border-destructive/10 hover:border-destructive/30 transition-all group shadow-sm shadow-destructive/5">
+                    <div className="flex flex-col md:flex-row md:items-center gap-6">
+                      <div className="w-14 h-14 rounded-xl bg-destructive/5 flex items-center justify-center shrink-0 border border-destructive/10">
+                        <span className="text-lg font-bold text-destructive">{p.codigo}</span>
+                      </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-bold text-lg truncate mb-1">{p.produto}</h4>
+                        <p className="text-sm text-muted-foreground truncate">{p.fabricante} • {p.tipo}</p>
+                      </div>
+
+                      <div className="w-full md:w-48 shrink-0 space-y-2">
+                        <div className="flex justify-between text-xs font-medium">
+                          <span className="text-muted-foreground">Reposição Sugerida</span>
+                          <span className="text-destructive font-bold">+{falta} un.</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                          <div 
+                            className="h-full bg-destructive transition-all duration-1000" 
+                            style={{ width: `${perc}%` }} 
+                          />
+                        </div>
+                        <p className="text-[10px] text-right text-muted-foreground italic">Atual: {p.quantidade} / Mín: {p.minimo}</p>
+                      </div>
+
+                      <div className="shrink-0">
+                         <button 
+                          onClick={() => navigate({ to: "/estoque", search: { busca: p.codigo } })}
+                          className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-all text-muted-foreground hover:text-white"
+                         >
+                           <ChevronRight className="h-5 w-5" />
+                         </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      </main>
+
+      <footer className="p-10 border-t border-white/5 text-center space-y-4">
+        <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed uppercase tracking-widest font-bold">
+           PERFORMANCE EXPERIENCE™
+        </p>
+        <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
+          By Francisco Chagas. Inteligência em Suprimentos. © 2026
+        </p>
+      </footer>
     </div>
   );
 }
