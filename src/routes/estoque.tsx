@@ -263,10 +263,10 @@ function Estoque() {
       <aside className={`fixed inset-y-0 left-0 z-40 transition-all duration-500 ease-in-out border-r border-white/5 bg-card/80 backdrop-blur-xl ${sidebarAberta ? 'w-64' : 'w-20'} hidden md:flex flex-col`}>
         <div className="h-20 flex items-center px-6 border-b border-white/5">
           <div className="flex items-center gap-3 overflow-hidden whitespace-nowrap">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-success flex items-center justify-center shadow-lg shadow-primary/20 shrink-0 border border-white/10 group-hover:premium-glow transition-all">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-success flex items-center justify-center shadow-lg shadow-primary/30 shrink-0 border border-white/10 group-hover:premium-glow transition-all">
               <div className="relative">
                 <LayoutDashboard className="h-6 w-6 text-primary-foreground" />
-                <div className="absolute -top-1 -right-1 h-2 w-2 bg-white rounded-full animate-pulse shadow-sm" />
+                <div className="absolute -top-1 -right-1 h-2 w-2 bg-white rounded-full animate-pulse shadow-[0_0_8px_white]" />
               </div>
             </div>
             <div className={`flex flex-col transition-opacity duration-300 ${sidebarAberta ? 'opacity-100' : 'opacity-0'}`}>
