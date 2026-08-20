@@ -429,13 +429,7 @@ function Estoque() {
     <div className="min-h-screen bg-background px-4 py-10 sm:py-16">
       <div className="mx-auto w-full max-w-4xl">
         <div className="mb-4 flex justify-end">
-          <button
-            type="button"
-            onClick={sair}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-primary/40 bg-card px-4 py-2 text-sm font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] transition hover:bg-primary/10"
-          >
-            <LogOut className="h-4 w-4" /> Sair
-          </button>
+          {/* O botão "Sair" ficava aqui, mas foi movido para o rodapé */}
         </div>
 
         <header className="relative mb-8">
@@ -451,6 +445,13 @@ function Estoque() {
                 <p className="mt-2 text-xs font-semibold tracking-wide text-primary">
                   By Francisco Chagas
                 </p>
+                <button
+                  type="button"
+                  onClick={sair}
+                  className="mt-4 inline-flex items-center justify-center gap-2 rounded-lg border border-primary/40 bg-card px-4 py-2 text-xs font-semibold text-primary shadow-[0_0_24px_-8px_var(--color-primary)] transition hover:bg-primary/10"
+                >
+                  <LogOut className="h-3.5 w-3.5" /> Sair
+                </button>
               </div>
 
               {/* Conteúdo central */}
