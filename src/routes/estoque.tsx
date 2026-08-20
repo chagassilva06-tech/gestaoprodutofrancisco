@@ -398,18 +398,22 @@ function Estoque() {
                 const perc = Math.min(100, (p.quantidade / p.minimo) * 100);
                 const isCritical = p.quantidade < p.minimo;
                 return (
-                  <div key={p.id} className={`glass-card p-4 rounded-2xl border transition-all hover:translate-x-1 ${isCritical ? 'border-destructive/20 hover:border-destructive/40 shadow-sm shadow-destructive/5' : 'border-white/5 hover:border-primary/30 shadow-sm shadow-black/20'}`}>
+                  <div key={p.id} className={`glass-card p-4 rounded-2xl border transition-all hover:shadow-lg ${isCritical ? 'border-destructive/30 bg-destructive/5 hover:border-destructive/50' : 'border-white/5 hover:border-primary/30'}`}>
                     <div className="flex flex-col md:flex-row md:items-center gap-6">
-                      <div className="w-16 h-16 rounded-xl bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
-                        <span className="text-xl font-bold text-muted-foreground">{p.codigo}</span>
+                      <div className="w-16 h-16 rounded-xl bg-white/5 flex items-center justify-center shrink-0 border border-white/5 group-hover:scale-105 transition-transform">
+                        <span className="text-xl font-bold text-muted-foreground/50">{p.codigo}</span>
                       </div>
                       
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-bold text-lg truncate">{p.produto}</h4>
-                          {isCritical && <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-destructive/10 text-destructive uppercase tracking-widest border border-destructive/20">Crítico</span>}
+                          <h4 className="font-bold text-lg truncate tracking-tight">{p.produto}</h4>
+                          {isCritical && (
+                            <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-destructive text-destructive-foreground uppercase tracking-widest animate-pulse">
+                              Reposição Imediata
+                            </span>
+                          )}
                         </div>
-                        <p className="text-sm text-muted-foreground truncate">{p.fabricante} • {p.tipo}</p>
+                        <p className="text-sm text-muted-foreground font-medium">{p.fabricante} • {p.tipo}</p>
                       </div>
 
                       <div className="w-full md:w-48 shrink-0 space-y-2">
@@ -425,33 +429,37 @@ function Estoque() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 shrink-0">
-                        <div className="flex items-center bg-black/20 rounded-xl border border-white/5 p-1">
+                      <div className="flex items-center gap-3 shrink-0">
+                        <div className="flex items-center bg-black/40 rounded-xl border border-white/10 p-1 group">
                           <button 
                             onClick={() => ajustarEstoque(p, -1)}
-                            className="p-2 hover:text-destructive transition-colors"
+                            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-destructive/20 hover:text-destructive transition-all active:scale-90"
+                            title="Remover do estoque"
                           >
-                            <span className="text-xl leading-none">−</span>
+                            <span className="text-lg font-bold">−</span>
                           </button>
                           <input 
                             type="number"
-                            className="w-12 bg-transparent text-center font-bold outline-none text-sm"
+                            className="w-10 bg-transparent text-center font-black outline-none text-sm focus:text-primary transition-colors"
                             value={reposicoes[p.id] || ""}
                             onChange={(e) => setReposicoes(prev => ({ ...prev, [p.id]: e.target.value }))}
                             placeholder="0"
+                            title="Quantidade para ajuste"
                           />
                           <button 
                             onClick={() => ajustarEstoque(p, 1)}
-                            className="p-2 hover:text-primary transition-colors"
+                            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-primary/20 hover:text-primary transition-all active:scale-90"
+                            title="Adicionar ao estoque"
                           >
-                            <span className="text-xl leading-none">+</span>
+                            <span className="text-lg font-bold">+</span>
                           </button>
                         </div>
                         <button 
                           onClick={() => setProductModal({ open: true, product: p })}
-                          className="p-3 hover:bg-white/5 rounded-xl transition-all"
+                          className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-all group"
+                          title="Editar detalhes do produto"
                         >
-                          <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                          <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
                         </button>
                       </div>
                     </div>
