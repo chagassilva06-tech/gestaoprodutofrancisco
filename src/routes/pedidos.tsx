@@ -163,7 +163,7 @@ function Pedidos() {
                 const falta = p.minimo - p.quantidade;
                 const perc = Math.min(100, (p.quantidade / p.minimo) * 100);
                 return (
-                  <div key={p.id} className="glass-card p-6 rounded-2xl border border-destructive/20 bg-destructive/5 hover:border-destructive/40 transition-all group shadow-sm shadow-destructive/5">
+                  <div key={p.id} className="glass-card p-6 rounded-[1.5rem] border border-destructive/20 bg-destructive/5 hover:border-destructive/40 transition-all group shadow-sm shadow-destructive/5 hover:premium-glow">
                     <div className="flex flex-col md:flex-row md:items-center gap-6">
                       <div className="w-14 h-14 rounded-xl bg-destructive/10 flex items-center justify-center shrink-0 border border-destructive/20 group-hover:scale-105 transition-transform">
                         <span className="text-lg font-black text-destructive">{p.codigo}</span>
