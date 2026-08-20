@@ -163,15 +163,15 @@ function Pedidos() {
                 const falta = p.minimo - p.quantidade;
                 const perc = Math.min(100, (p.quantidade / p.minimo) * 100);
                 return (
-                  <div key={p.id} className="glass-card p-6 rounded-2xl border border-destructive/10 hover:border-destructive/30 transition-all group shadow-sm shadow-destructive/5">
+                  <div key={p.id} className="glass-card p-6 rounded-2xl border border-destructive/20 bg-destructive/5 hover:border-destructive/40 transition-all group shadow-sm shadow-destructive/5">
                     <div className="flex flex-col md:flex-row md:items-center gap-6">
-                      <div className="w-14 h-14 rounded-xl bg-destructive/5 flex items-center justify-center shrink-0 border border-destructive/10">
-                        <span className="text-lg font-bold text-destructive">{p.codigo}</span>
+                      <div className="w-14 h-14 rounded-xl bg-destructive/10 flex items-center justify-center shrink-0 border border-destructive/20 group-hover:scale-105 transition-transform">
+                        <span className="text-lg font-black text-destructive">{p.codigo}</span>
                       </div>
                       
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-bold text-lg truncate mb-1">{p.produto}</h4>
-                        <p className="text-sm text-muted-foreground truncate">{p.fabricante} • {p.tipo}</p>
+                        <h4 className="font-bold text-lg truncate mb-1 tracking-tight">{p.produto}</h4>
+                        <p className="text-sm text-muted-foreground font-medium">{p.fabricante} • {p.tipo}</p>
                       </div>
 
                       <div className="w-full md:w-48 shrink-0 space-y-2">
@@ -191,7 +191,8 @@ function Pedidos() {
                       <div className="shrink-0">
                          <button 
                           onClick={() => navigate({ to: "/estoque", search: { busca: p.codigo } })}
-                          className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-all text-muted-foreground hover:text-white"
+                          className="p-3 bg-white/5 hover:bg-primary/20 hover:text-primary rounded-xl transition-all text-muted-foreground active:scale-90"
+                          title={`Ver ${p.produto} no estoque`}
                          >
                            <ChevronRight className="h-5 w-5" />
                          </button>
