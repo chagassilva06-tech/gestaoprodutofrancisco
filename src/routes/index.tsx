@@ -98,7 +98,7 @@ function Index() {
 
           <button
             disabled={busy}
-            className="w-full py-4 rounded-xl bg-gradient-to-r from-primary to-success text-primary-foreground font-bold shadow-[0_4px_20px_-4px_var(--color-primary)] hover:shadow-[0_8px_30px_-5px_var(--color-primary)] hover:-translate-y-0.5 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full py-5 rounded-2xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-black uppercase tracking-widest shadow-[0_10px_30px_-10px_var(--color-primary)] hover:shadow-[0_15px_40px_-12px_var(--color-primary)] hover:-translate-y-1 active:scale-[0.97] transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {busy && <div className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />}
             {busy ? "Validando Acesso..." : modo === "entrar" ? "Autenticar no Sistema" : "Criar Nova Conta"}
