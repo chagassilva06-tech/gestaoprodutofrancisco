@@ -5,8 +5,6 @@ import { LogOut, LayoutDashboard, ShoppingCart, Search, Plus, History, FileText,
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import {
-  CATEGORIAS_EXEMPLO,
-  PRODUTOS_EXEMPLO,
   type Category,
   type Movement,
   type Product,
@@ -262,7 +260,6 @@ function Estoque() {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground selection:bg-primary/30">
-      {/* Sidebar Premium */}
       <aside className={`fixed inset-y-0 left-0 z-40 transition-all duration-500 ease-in-out border-r border-white/5 bg-card/80 backdrop-blur-xl ${sidebarAberta ? 'w-64' : 'w-20'} hidden md:flex flex-col`}>
         <div className="h-20 flex items-center px-6 border-b border-white/5">
           <div className="flex items-center gap-3 overflow-hidden whitespace-nowrap">
@@ -298,9 +295,7 @@ function Estoque() {
         </div>
       </aside>
 
-      {/* Main Content Area */}
       <main className={`flex-1 transition-all duration-500 ${sidebarAberta ? 'md:ml-64' : 'md:ml-20'}`}>
-        {/* Top Header */}
         <header className="sticky top-0 z-30 h-20 border-b border-white/5 bg-background/80 backdrop-blur-md px-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button onClick={() => setSidebarAberta(!sidebarAberta)} className="p-2 hover:bg-white/5 rounded-lg text-muted-foreground transition-colors md:flex hidden">
