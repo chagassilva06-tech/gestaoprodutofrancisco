@@ -110,22 +110,22 @@ function Pedidos() {
       <main className="p-6 md:p-10 max-w-5xl mx-auto space-y-8">
         {/* Quick Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="glass-card p-6 rounded-2xl border border-destructive/20 shadow-sm shadow-destructive/5 relative overflow-hidden group">
+          <div className="glass-card p-6 rounded-[1.5rem] border border-destructive/20 shadow-sm shadow-destructive/5 relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:scale-110 transition-transform">
               <AlertCircle className="h-20 w-20 text-destructive" />
             </div>
-            <p className="text-xs font-medium text-muted-foreground mb-1 uppercase tracking-widest">Produtos em Alerta</p>
-            <h3 className="text-3xl font-bold tracking-tight text-destructive">{products.length}</h3>
-            <p className="text-xs text-destructive/70 mt-2">Requerem atenção imediata</p>
+            <p className="text-[10px] font-bold text-muted-foreground mb-1 uppercase tracking-widest opacity-60">Produtos em Alerta</p>
+            <h3 className="text-3xl font-black tracking-tight text-destructive">{products.length}</h3>
+            <p className="text-[10px] text-destructive/70 mt-2 font-bold uppercase tracking-wider">Requerem atenção imediata</p>
           </div>
           
-          <div className="glass-card p-6 rounded-2xl border border-primary/20 shadow-sm shadow-primary/5 relative overflow-hidden group">
+          <div className="glass-card p-6 rounded-[1.5rem] border border-primary/20 shadow-sm shadow-primary/5 relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:scale-110 transition-transform">
               <ShoppingCart className="h-20 w-20 text-primary" />
             </div>
-            <p className="text-xs font-medium text-muted-foreground mb-1 uppercase tracking-widest">Volume Necessário</p>
-            <h3 className="text-3xl font-bold tracking-tight text-primary">{totalFaltante.toLocaleString("pt-BR")}</h3>
-            <p className="text-xs text-primary/70 mt-2">Unidades para atingir o mínimo</p>
+            <p className="text-[10px] font-bold text-muted-foreground mb-1 uppercase tracking-widest opacity-60">Volume Necessário</p>
+            <h3 className="text-3xl font-black tracking-tight text-primary">{totalFaltante.toLocaleString("pt-BR")}</h3>
+            <p className="text-[10px] text-primary/70 mt-2 font-bold uppercase tracking-wider">Unidades para atingir o mínimo</p>
           </div>
         </div>
 
