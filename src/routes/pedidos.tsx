@@ -75,18 +75,34 @@ function Pedidos() {
           <button onClick={() => navigate({ to: "/estoque" })} className="p-2 hover:bg-white/5 rounded-lg text-muted-foreground transition-colors group">
             <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
           </button>
-          <div className="flex flex-col">
-            <h1 className="text-lg font-bold tracking-tight">Módulo de Pedidos</h1>
-            <p className="text-xs text-muted-foreground">Itens abaixo do mínimo padronizado</p>
+          
+          <div className="flex items-center gap-3 pr-4 border-r border-white/5">
+            <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-primary to-success flex items-center justify-center shadow-md shadow-primary/20 shrink-0 border border-white/10">
+              <Package className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-display font-black text-sm tracking-tighter text-white">INVENTORY</span>
+              <span className="text-[8px] font-bold tracking-[0.2em] text-primary -mt-1 uppercase">Control</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-lg bg-destructive/10 border border-destructive/20 flex items-center justify-center text-destructive">
+              <ShoppingCart className="h-5 w-5" />
+            </div>
+            <div className="flex flex-col">
+              <h1 className="text-sm font-bold tracking-tight">Módulo de Pedidos</h1>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Itens Críticos</p>
+            </div>
           </div>
         </div>
 
         <div className="flex items-center gap-4">
           <button 
             onClick={() => navigate({ to: "/estoque" })}
-            className="hidden sm:flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-sm font-bold hover:bg-white/10 transition-all"
+            className="hidden sm:flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-xs font-bold hover:bg-white/10 transition-all uppercase tracking-widest"
           >
-            <Package className="h-4 w-4" /> Voltar ao Estoque
+            Voltar ao Dashboard
           </button>
         </div>
       </header>
