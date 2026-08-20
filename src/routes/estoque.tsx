@@ -358,7 +358,7 @@ function Estoque() {
               <input
                 type="text"
                 placeholder="Pesquisar por Código, Produto ou Fabricante..."
-                className="w-full bg-card/50 border border-white/5 rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all shadow-inner text-base font-medium placeholder:text-muted-foreground/40"
+                className="w-full bg-card/30 border border-white/5 rounded-2xl py-5 pl-14 pr-4 focus:ring-2 focus:ring-primary/40 focus:border-primary/50 outline-none transition-all shadow-inner text-base font-medium placeholder:text-muted-foreground/30"
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
                 aria-label="Pesquisar no inventário"
